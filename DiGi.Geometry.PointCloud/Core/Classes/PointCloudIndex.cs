@@ -217,6 +217,217 @@ namespace DiGi.Geometry.PointCloud.Core.Classes
             return result_Temp;
         }
 
+        /// <summary>
+        /// Retrieves the indexes of the points closest to a query position, nearest first.
+        /// <para>The traversal is a depth-first descent that visits the children of every node in order of their distance from the query, nearest first. That ordering is what makes it fast: the very first leaf reached is the one containing the query, so the candidate set fills with genuinely close points immediately and the rejection radius collapses to a small value before any sibling is considered. Every remaining node is then dismissed by a single comparison. A best-first search with a priority queue visits the same nodes for a request this small, and pays for a heap to do it.</para>
+        /// <para>Nodes are rejected when the distance from the query to the node box is not smaller than the distance to the furthest candidate held so far. This is sound because the boxes are single precision rounded outward, so they enclose more space than the points they own: the measured distance to a box can only understate the distance to the nearest point inside it, and understating it can only preserve a node that would otherwise be dropped.</para>
+        /// <para>Nothing is allocated. The candidate set, the child ordering buffers and the traversal stack are all supplied by the caller or stack-allocated, and the whole search runs on scalar values without materializing a single point object.</para>
+        /// </summary>
+        /// <param name="coordinates">The coordinate arrays of the cloud the index was built for.</param>
+        /// <param name="x">The X coordinate of the query position.</param>
+        /// <param name="y">The Y coordinate of the query position.</param>
+        /// <param name="z">The Z coordinate of the query position. Ignored for a planar index.</param>
+        /// <param name="indexes">A buffer receiving the point indexes, nearest first. Its length is the number of neighbours requested.</param>
+        /// <param name="distancesSquared">A buffer receiving the matching squared distances, which must be at least as long as <paramref name="indexes"/>.</param>
+        /// <returns>The number of neighbours written, which is smaller than the requested count when the cloud holds fewer points, or -1 when the input is mismatched or the traversal stack overflowed.</returns>
+        public int NearestIndexes(
+            double[][]? coordinates,
+            double x,
+            double y,
+            double z,
+            Span<int> indexes,
+            Span<double> distancesSquared)
+        {
+            int count_Requested = indexes.Length;
+            if (coordinates == null || coordinates.Length != dimension || count_Requested <= 0 || distancesSquared.Length < count_Requested || nodes.Length == 0)
+            {
+                return -1;
+            }
+
+            for (int i = 0; i < count_Requested; i++)
+            {
+                indexes[i] = -1;
+                distancesSquared[i] = double.PositiveInfinity;
+            }
+
+            double[] values_X = coordinates[0];
+            double[] values_Y = coordinates[1];
+            double[] values_Z = dimension == 3 ? coordinates[2] : values_X;
+
+            int count_Filled = 0;
+
+            // Positive infinity until the candidate set is full, so that every point is admitted while
+            // it is still filling. Once full this is the rejection radius, and it only ever shrinks.
+            double worst = double.PositiveInfinity;
+
+            Span<int> stack = stackalloc int[64];
+            int stackCount = 0;
+            stack[stackCount++] = 0;
+
+            Span<int> children = stackalloc int[8];
+            Span<double> distancesSquared_Child = stackalloc double[8];
+
+            while (stackCount > 0)
+            {
+                PointCloudIndexNode node = nodes[stack[--stackCount]];
+
+                // Re-tested on the way out as well as on the way in: the radius shrinks while this node
+                // waits on the stack, so a node that was worth queuing is often no longer worth opening.
+                if (DistanceSquaredToBounds(node, x, y, z, dimension) >= worst)
+                {
+                    continue;
+                }
+
+                if (node.ChildCount != 0)
+                {
+                    if (node.ChildCount > children.Length)
+                    {
+                        // Unreachable for a well-formed index, where a parent owns at most one child per
+                        // octant. Handled rather than assumed: an unordered descent is still correct.
+                        for (int i = 0; i < node.ChildCount; i++)
+                        {
+                            if (stackCount == stack.Length)
+                            {
+                                return -1;
+                            }
+
+                            stack[stackCount++] = node.FirstChild + i;
+                        }
+
+                        continue;
+                    }
+
+                    int count_Child = 0;
+                    for (int i = 0; i < node.ChildCount; i++)
+                    {
+                        int index_Node = node.FirstChild + i;
+
+                        double distanceSquared = DistanceSquaredToBounds(nodes[index_Node], x, y, z, dimension);
+                        if (distanceSquared >= worst)
+                        {
+                            continue;
+                        }
+
+                        // Sorted descending, so pushing in order leaves the nearest child on top of the
+                        // stack. Dropping the hopeless children here is also what keeps the stack bounded.
+                        int position = count_Child++;
+                        while (position > 0 && distancesSquared_Child[position - 1] < distanceSquared)
+                        {
+                            distancesSquared_Child[position] = distancesSquared_Child[position - 1];
+                            children[position] = children[position - 1];
+                            position--;
+                        }
+
+                        distancesSquared_Child[position] = distanceSquared;
+                        children[position] = index_Node;
+                    }
+
+                    for (int i = 0; i < count_Child; i++)
+                    {
+                        if (stackCount == stack.Length)
+                        {
+                            return -1;
+                        }
+
+                        stack[stackCount++] = children[i];
+                    }
+
+                    continue;
+                }
+
+                int end = node.Start + node.Count;
+                for (int i = node.Start; i < end; i++)
+                {
+                    int index = order[i];
+
+                    double dx = values_X[index] - x;
+                    double dy = values_Y[index] - y;
+                    double distanceSquared = (dx * dx) + (dy * dy);
+
+                    if (dimension == 3)
+                    {
+                        double dz = values_Z[index] - z;
+                        distanceSquared += dz * dz;
+                    }
+
+                    // Cheap rejection before the call, which is where almost every leaf point ends up
+                    // once the radius has collapsed. Ties and non-finite values fall through and are
+                    // resolved by the shared insertion, so both search paths order them identically.
+                    if (count_Filled == count_Requested && distanceSquared > worst)
+                    {
+                        continue;
+                    }
+
+                    Modify.InsertNeighbor(indexes, distancesSquared, index, distanceSquared, ref count_Filled, ref worst);
+                }
+            }
+
+            return count_Filled;
+        }
+
+        /// <summary>
+        /// Calculates the squared distance from a position to the nearest point of a node box, which is zero when the position lies inside it.
+        /// </summary>
+        /// <param name="node">The node whose box is measured.</param>
+        /// <param name="x">The X coordinate of the position.</param>
+        /// <param name="y">The Y coordinate of the position.</param>
+        /// <param name="z">The Z coordinate of the position.</param>
+        /// <param name="dimension">The number of coordinate axes. The Z term is omitted for two, where the node box carries a placeholder depth of zero.</param>
+        /// <returns>A <see cref="double"/> squared distance.</returns>
+        private static double DistanceSquaredToBounds(in PointCloudIndexNode node, double x, double y, double z, int dimension)
+        {
+            double result = 0;
+
+            double delta = x - node.MinX;
+            if (delta < 0)
+            {
+                result += delta * delta;
+            }
+            else
+            {
+                delta = x - node.MaxX;
+                if (delta > 0)
+                {
+                    result += delta * delta;
+                }
+            }
+
+            delta = y - node.MinY;
+            if (delta < 0)
+            {
+                result += delta * delta;
+            }
+            else
+            {
+                delta = y - node.MaxY;
+                if (delta > 0)
+                {
+                    result += delta * delta;
+                }
+            }
+
+            if (dimension != 3)
+            {
+                return result;
+            }
+
+            delta = z - node.MinZ;
+            if (delta < 0)
+            {
+                result += delta * delta;
+            }
+            else
+            {
+                delta = z - node.MaxZ;
+                if (delta > 0)
+                {
+                    result += delta * delta;
+                }
+            }
+
+            return result;
+        }
+
         private static float MathF_BitDecrement(float value)
         {
             // MathF is not available on netstandard2.0, and a single ulp step is all that is needed to

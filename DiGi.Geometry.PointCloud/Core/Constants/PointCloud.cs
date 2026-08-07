@@ -19,6 +19,18 @@ namespace DiGi.Geometry.PointCloud.Core.Constants
         public const int ParallelThresholdIndex = 50000;
 
         /// <summary>
+        /// The minimum number of query points at which a batch nearest neighbour search is worth parallelising.
+        /// <para>An indexed descent for a single query costs roughly one to three microseconds, so a partition of this size carries well over a millisecond of work against a dispatch cost of 5-20 microseconds. Unlike the streaming passes this workload is latency bound rather than bandwidth bound, so it is partitioned across every processor rather than the streaming fraction.</para>
+        /// </summary>
+        public const int ParallelThresholdNeighbor = 1024;
+
+        /// <summary>
+        /// The number of nearest neighbours collected when a non-degenerate triple is required.
+        /// <para>Three points are enough only when they are not collinear, which fails whenever the query sits on a scan line or a grid line of the source data. Collecting this many candidates lets the triangle factory step past a degenerate pair without a second traversal: the extra neighbours come from leaves that are already resident, so the additional cost is a handful of comparisons.</para>
+        /// </summary>
+        public const int MaximumNeighborCandidateCount = 8;
+
+        /// <summary>
         /// The minimum point count at which building a spatial index is worthwhile.
         /// <para>Below this size a vectorised brute-force scan completes in tens of microseconds, which is cheaper than any index build. Callers should skip index construction entirely below this threshold.</para>
         /// </summary>

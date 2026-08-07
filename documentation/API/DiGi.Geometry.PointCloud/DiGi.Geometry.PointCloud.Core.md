@@ -300,6 +300,63 @@ public static class Modify
 Inheritance [System\.Object](https://learn.microsoft.com/en-us/dotnet/api/system.object 'System\.Object') → Modify
 ### Methods
 
+<a name='DiGi.Geometry.PointCloud.Core.Modify.InsertNeighbor(System.Span_int_,System.Span_double_,int,double,int,double)'></a>
+
+## Modify\.InsertNeighbor\(Span\<int\>, Span\<double\>, int, double, int, double\) Method
+
+Offers a candidate to an insertion\-sorted nearest neighbour set, evicting the furthest entry when the set is already full\.
+
+An insertion sort rather than a heap. A nearest neighbour set holds a handful of entries, so the whole structure stays in registers, the shifting loop is predictable, and a heap would add indirection and a larger constant factor for no asymptotic gain at this size.
+
+Ordering is by squared distance and then by point index, so equal distances resolve towards the lower index. This is what lets the indexed descent and the exhaustive scan return the same answer: one visits points in Z-order and the other in input order, and without an explicit tie-break a cloud containing duplicated points would answer differently depending on whether it was large enough to be indexed.
+
+Both paths route their candidates through here rather than repeating the comparison, because the two orderings only agree as long as they are literally the same code.
+
+```csharp
+public static bool InsertNeighbor(System.Span<int> indexes, System.Span<double> distancesSquared, int index, double distanceSquared, ref int filled, ref double worst);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Modify.InsertNeighbor(System.Span_int_,System.Span_double_,int,double,int,double).indexes'></a>
+
+`indexes` [System\.Span&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')
+
+The candidate point indexes, ordered nearest first\. Its length is the number of neighbours being collected\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Modify.InsertNeighbor(System.Span_int_,System.Span_double_,int,double,int,double).distancesSquared'></a>
+
+`distancesSquared` [System\.Span&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')[System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')
+
+The matching squared distances, which must be at least as long as [indexes](DiGi.Geometry.PointCloud.Core.md#DiGi.Geometry.PointCloud.Core.Modify.InsertNeighbor(System.Span_int_,System.Span_double_,int,double,int,double).indexes 'DiGi\.Geometry\.PointCloud\.Core\.Modify\.InsertNeighbor\(System\.Span\<int\>, System\.Span\<double\>, int, double, int, double\)\.indexes')\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Modify.InsertNeighbor(System.Span_int_,System.Span_double_,int,double,int,double).index'></a>
+
+`index` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+The zero\-based index of the point being offered\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Modify.InsertNeighbor(System.Span_int_,System.Span_double_,int,double,int,double).distanceSquared'></a>
+
+`distanceSquared` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+The squared distance from the query position to the point being offered\. A value of [System\.Double\.NaN](https://learn.microsoft.com/en-us/dotnet/api/system.double.nan 'System\.Double\.NaN') is always rejected\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Modify.InsertNeighbor(System.Span_int_,System.Span_double_,int,double,int,double).filled'></a>
+
+`filled` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+The number of entries currently held, updated when the set grows\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Modify.InsertNeighbor(System.Span_int_,System.Span_double_,int,double,int,double).worst'></a>
+
+`worst` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+The current rejection radius, updated whenever the set changes\. Holds [System\.Double\.PositiveInfinity](https://learn.microsoft.com/en-us/dotnet/api/system.double.positiveinfinity 'System\.Double\.PositiveInfinity') until the set is full\.
+
+#### Returns
+[System\.Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean 'System\.Boolean')  
+[true](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/bool 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/builtin\-types/bool') when the candidate was taken into the set; otherwise [false](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/bool 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/builtin\-types/bool')\.
+
 <a name='DiGi.Geometry.PointCloud.Core.Modify.OffsetCoordinates(thisdouble[][],double[])'></a>
 
 ## Modify\.OffsetCoordinates\(this double\[\]\[\], double\[\]\) Method
@@ -790,6 +847,151 @@ The number of bits taken from each axis\.
 [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')  
 An [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32') holding the interleaved cell identifier\.
 
+<a name='DiGi.Geometry.PointCloud.Core.Query.NearestIndexes(thisDiGi.Geometry.PointCloud.Core.Classes.PointCloud,System.ReadOnlySpan_double_,System.Span_int_,System.Span_double_)'></a>
+
+## Query\.NearestIndexes\(this PointCloud, ReadOnlySpan\<double\>, Span\<int\>, Span\<double\>\) Method
+
+Retrieves the indexes of the points of a cloud closest to a query position, nearest first\.
+
+Chooses between the two searches the same way the box queries do. Above [IndexThreshold](DiGi.Geometry.PointCloud.Core.Constants.md#DiGi.Geometry.PointCloud.Core.Constants.PointCloud.IndexThreshold 'DiGi\.Geometry\.PointCloud\.Core\.Constants\.PointCloud\.IndexThreshold') the cloud carries a spatial index and the descent visits a few dozen nodes regardless of how large the cloud is; below it there is no index and an exhaustive vectorised sweep is cheaper than building one.
+
+Both searches return the same answer for the same input, including on duplicated points, because both order their candidates through [InsertNeighbor\(Span&lt;int&gt;, Span&lt;double&gt;, int, double, int, double\)](DiGi.Geometry.PointCloud.Core.md#DiGi.Geometry.PointCloud.Core.Modify.InsertNeighbor(System.Span_int_,System.Span_double_,int,double,int,double) 'DiGi\.Geometry\.PointCloud\.Core\.Modify\.InsertNeighbor\(System\.Span\<int\>, System\.Span\<double\>, int, double, int, double\)').
+
+Nothing is allocated on either path. The caller owns the result buffers, and the search runs on scalar coordinates without materializing a point object.
+
+```csharp
+public static int NearestIndexes(this DiGi.Geometry.PointCloud.Core.Classes.PointCloud? pointCloud, System.ReadOnlySpan<double> query, System.Span<int> indexes, System.Span<double> distancesSquared);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.NearestIndexes(thisDiGi.Geometry.PointCloud.Core.Classes.PointCloud,System.ReadOnlySpan_double_,System.Span_int_,System.Span_double_).pointCloud'></a>
+
+`pointCloud` [PointCloud](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloud 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloud')
+
+The cloud to search\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.NearestIndexes(thisDiGi.Geometry.PointCloud.Core.Classes.PointCloud,System.ReadOnlySpan_double_,System.Span_int_,System.Span_double_).query'></a>
+
+`query` [System\.ReadOnlySpan&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.readonlyspan-1 'System\.ReadOnlySpan\`1')[System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.readonlyspan-1 'System\.ReadOnlySpan\`1')
+
+The query position, holding one value per axis\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.NearestIndexes(thisDiGi.Geometry.PointCloud.Core.Classes.PointCloud,System.ReadOnlySpan_double_,System.Span_int_,System.Span_double_).indexes'></a>
+
+`indexes` [System\.Span&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')
+
+A buffer receiving the point indexes, nearest first\. Its length is the number of neighbours requested\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.NearestIndexes(thisDiGi.Geometry.PointCloud.Core.Classes.PointCloud,System.ReadOnlySpan_double_,System.Span_int_,System.Span_double_).distancesSquared'></a>
+
+`distancesSquared` [System\.Span&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')[System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')
+
+A buffer receiving the matching squared distances, which must be at least as long as [indexes](DiGi.Geometry.PointCloud.Core.md#DiGi.Geometry.PointCloud.Core.Query.NearestIndexes(thisDiGi.Geometry.PointCloud.Core.Classes.PointCloud,System.ReadOnlySpan_double_,System.Span_int_,System.Span_double_).indexes 'DiGi\.Geometry\.PointCloud\.Core\.Query\.NearestIndexes\(this DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloud, System\.ReadOnlySpan\<double\>, System\.Span\<int\>, System\.Span\<double\>\)\.indexes')\.
+
+#### Returns
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')  
+The number of neighbours written, which is smaller than the requested count when the cloud holds fewer points, or \-1 when the cloud is empty or the request is mismatched\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.NearestIndexes(thisdouble[][],System.ReadOnlySpan_double_,System.Span_int_,System.Span_double_)'></a>
+
+## Query\.NearestIndexes\(this double\[\]\[\], ReadOnlySpan\<double\>, Span\<int\>, Span\<double\>\) Method
+
+Retrieves the indexes of the points of a coordinate\-major payload closest to a query position, nearest first\.
+
+This is the path taken when no spatial index exists, which is every cloud below [IndexThreshold](DiGi.Geometry.PointCloud.Core.Constants.md#DiGi.Geometry.PointCloud.Core.Constants.PointCloud.IndexThreshold 'DiGi\.Geometry\.PointCloud\.Core\.Constants\.PointCloud\.IndexThreshold'). An exhaustive vectorised sweep over that many points finishes in tens of microseconds, which is less than building an index would cost, so there is nothing to gain from a hierarchy at that size.
+
+Parallelised only above [ParallelThreshold](DiGi.Geometry.PointCloud.Core.Constants.md#DiGi.Geometry.PointCloud.Core.Constants.PointCloud.ParallelThreshold 'DiGi\.Geometry\.PointCloud\.Core\.Constants\.PointCloud\.ParallelThreshold'), which in practice means only when a cloud large enough to be indexed failed to produce an index. Each partition collects its own candidate set and they are merged afterwards, which is exact rather than approximate: a global winner is a winner in whichever partition holds it.
+
+```csharp
+public static int NearestIndexes(this double[][]? coordinates, System.ReadOnlySpan<double> query, System.Span<int> indexes, System.Span<double> distancesSquared);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.NearestIndexes(thisdouble[][],System.ReadOnlySpan_double_,System.Span_int_,System.Span_double_).coordinates'></a>
+
+`coordinates` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The coordinate arrays, one per axis, all of equal length\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.NearestIndexes(thisdouble[][],System.ReadOnlySpan_double_,System.Span_int_,System.Span_double_).query'></a>
+
+`query` [System\.ReadOnlySpan&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.readonlyspan-1 'System\.ReadOnlySpan\`1')[System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.readonlyspan-1 'System\.ReadOnlySpan\`1')
+
+The query position, holding one value per axis\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.NearestIndexes(thisdouble[][],System.ReadOnlySpan_double_,System.Span_int_,System.Span_double_).indexes'></a>
+
+`indexes` [System\.Span&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')
+
+A buffer receiving the point indexes, nearest first\. Its length is the number of neighbours requested\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.NearestIndexes(thisdouble[][],System.ReadOnlySpan_double_,System.Span_int_,System.Span_double_).distancesSquared'></a>
+
+`distancesSquared` [System\.Span&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')[System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')
+
+A buffer receiving the matching squared distances, which must be at least as long as [indexes](DiGi.Geometry.PointCloud.Core.md#DiGi.Geometry.PointCloud.Core.Query.NearestIndexes(thisdouble[][],System.ReadOnlySpan_double_,System.Span_int_,System.Span_double_).indexes 'DiGi\.Geometry\.PointCloud\.Core\.Query\.NearestIndexes\(this double\[\]\[\], System\.ReadOnlySpan\<double\>, System\.Span\<int\>, System\.Span\<double\>\)\.indexes')\.
+
+#### Returns
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')  
+The number of neighbours written, which is smaller than the requested count when the payload holds fewer points, or \-1 when the input is null, ragged or mismatched\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.NearestIndexes(thisdouble[][],System.ReadOnlySpan_double_,System.Span_int_,System.Span_double_,int,int)'></a>
+
+## Query\.NearestIndexes\(this double\[\]\[\], ReadOnlySpan\<double\>, Span\<int\>, Span\<double\>, int, int\) Method
+
+Retrieves the indexes of the points of a contiguous range of a coordinate\-major payload closest to a query position, nearest first\.
+
+The sweep is vectorised, and the shape of it is what makes it cheap. A lane-wise squared distance is compared against a broadcast of the current rejection radius, and when no lane beats it the whole block is skipped with a single test. Only a block that actually contains a candidate is unpacked lane by lane, and only then is the broadcast rebuilt.
+
+That asymmetry is the point. The radius collapses within the first few hundred points and almost never moves again, so the steady state is a handful of arithmetic operations per block with a perfectly predicted branch, and no per-lane extraction at all. Extraction would otherwise dominate, because the move-mask instruction that makes it cheap lives behind the hardware intrinsics surface, which is not available on this target.
+
+Squared distances are compared throughout. Squaring is monotonic, so every comparison is exact, and the square root is never needed.
+
+```csharp
+public static int NearestIndexes(this double[][]? coordinates, System.ReadOnlySpan<double> query, System.Span<int> indexes, System.Span<double> distancesSquared, int startIndex, int count);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.NearestIndexes(thisdouble[][],System.ReadOnlySpan_double_,System.Span_int_,System.Span_double_,int,int).coordinates'></a>
+
+`coordinates` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The coordinate arrays, one per axis, all of equal length\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.NearestIndexes(thisdouble[][],System.ReadOnlySpan_double_,System.Span_int_,System.Span_double_,int,int).query'></a>
+
+`query` [System\.ReadOnlySpan&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.readonlyspan-1 'System\.ReadOnlySpan\`1')[System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.readonlyspan-1 'System\.ReadOnlySpan\`1')
+
+The query position, holding one value per axis\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.NearestIndexes(thisdouble[][],System.ReadOnlySpan_double_,System.Span_int_,System.Span_double_,int,int).indexes'></a>
+
+`indexes` [System\.Span&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')
+
+A buffer receiving the point indexes, nearest first\. Its length is the number of neighbours requested\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.NearestIndexes(thisdouble[][],System.ReadOnlySpan_double_,System.Span_int_,System.Span_double_,int,int).distancesSquared'></a>
+
+`distancesSquared` [System\.Span&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')[System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')
+
+A buffer receiving the matching squared distances, which must be at least as long as [indexes](DiGi.Geometry.PointCloud.Core.md#DiGi.Geometry.PointCloud.Core.Query.NearestIndexes(thisdouble[][],System.ReadOnlySpan_double_,System.Span_int_,System.Span_double_,int,int).indexes 'DiGi\.Geometry\.PointCloud\.Core\.Query\.NearestIndexes\(this double\[\]\[\], System\.ReadOnlySpan\<double\>, System\.Span\<int\>, System\.Span\<double\>, int, int\)\.indexes')\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.NearestIndexes(thisdouble[][],System.ReadOnlySpan_double_,System.Span_int_,System.Span_double_,int,int).startIndex'></a>
+
+`startIndex` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+The inclusive index at which the range starts\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.NearestIndexes(thisdouble[][],System.ReadOnlySpan_double_,System.Span_int_,System.Span_double_,int,int).count'></a>
+
+`count` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+The number of points in the range\.
+
+#### Returns
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')  
+The number of neighbours written, or \-1 when the input is mismatched or the range is out of bounds\.
+
 <a name='DiGi.Geometry.PointCloud.Core.Query.PartitionCount(int,int,double)'></a>
 
 ## Query\.PartitionCount\(int, int, double\) Method
@@ -824,3 +1026,26 @@ The fraction of available processors to use\. Use a value below one for memory\-
 #### Returns
 [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')  
 An [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32') partition count of at least one\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.PointCount(thisdouble[][])'></a>
+
+## Query\.PointCount\(this double\[\]\[\]\) Method
+
+Calculates the number of points held by a coordinate\-major payload, verifying that it is rectangular\.
+
+A payload whose axis arrays differ in length has no meaningful point count, so the ragged case is reported rather than silently answered from the first axis.
+
+```csharp
+public static int PointCount(this double[][]? coordinates);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.PointCount(thisdouble[][]).coordinates'></a>
+
+`coordinates` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The coordinate arrays, one per axis\.
+
+#### Returns
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')  
+The number of points, or \-1 when the payload is null, ragged or holds an unsupported number of axes\.

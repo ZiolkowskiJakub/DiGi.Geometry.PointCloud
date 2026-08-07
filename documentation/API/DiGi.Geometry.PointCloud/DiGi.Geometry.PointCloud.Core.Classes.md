@@ -520,6 +520,51 @@ public int NodeCount { get; }
 An [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32') node count\.
 ### Methods
 
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndex.DistanceSquaredToBounds(DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndexNode,double,double,double,int)'></a>
+
+## PointCloudIndex\.DistanceSquaredToBounds\(PointCloudIndexNode, double, double, double, int\) Method
+
+Calculates the squared distance from a position to the nearest point of a node box, which is zero when the position lies inside it\.
+
+```csharp
+private static double DistanceSquaredToBounds(in DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndexNode node, double x, double y, double z, int dimension);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndex.DistanceSquaredToBounds(DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndexNode,double,double,double,int).node'></a>
+
+`node` [PointCloudIndexNode](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndexNode 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudIndexNode')
+
+The node whose box is measured\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndex.DistanceSquaredToBounds(DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndexNode,double,double,double,int).x'></a>
+
+`x` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+The X coordinate of the position\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndex.DistanceSquaredToBounds(DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndexNode,double,double,double,int).y'></a>
+
+`y` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+The Y coordinate of the position\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndex.DistanceSquaredToBounds(DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndexNode,double,double,double,int).z'></a>
+
+`z` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+The Z coordinate of the position\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndex.DistanceSquaredToBounds(DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndexNode,double,double,double,int).dimension'></a>
+
+`dimension` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+The number of coordinate axes\. The Z term is omitted for two, where the node box carries a placeholder depth of zero\.
+
+#### Returns
+[System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')  
+A [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double') squared distance\.
+
 <a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndex.InRangeIndexes(double[][],double[],double[])'></a>
 
 ## PointCloudIndex\.InRangeIndexes\(double\[\]\[\], double\[\], double\[\]\) Method
@@ -556,6 +601,63 @@ The inclusive upper bound of each axis, tolerance already folded in\.
 #### Returns
 [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')  
 An [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32') array of ascending point indexes, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the input is mismatched\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndex.NearestIndexes(double[][],double,double,double,System.Span_int_,System.Span_double_)'></a>
+
+## PointCloudIndex\.NearestIndexes\(double\[\]\[\], double, double, double, Span\<int\>, Span\<double\>\) Method
+
+Retrieves the indexes of the points closest to a query position, nearest first\.
+
+The traversal is a depth-first descent that visits the children of every node in order of their distance from the query, nearest first. That ordering is what makes it fast: the very first leaf reached is the one containing the query, so the candidate set fills with genuinely close points immediately and the rejection radius collapses to a small value before any sibling is considered. Every remaining node is then dismissed by a single comparison. A best-first search with a priority queue visits the same nodes for a request this small, and pays for a heap to do it.
+
+Nodes are rejected when the distance from the query to the node box is not smaller than the distance to the furthest candidate held so far. This is sound because the boxes are single precision rounded outward, so they enclose more space than the points they own: the measured distance to a box can only understate the distance to the nearest point inside it, and understating it can only preserve a node that would otherwise be dropped.
+
+Nothing is allocated. The candidate set, the child ordering buffers and the traversal stack are all supplied by the caller or stack-allocated, and the whole search runs on scalar values without materializing a single point object.
+
+```csharp
+public int NearestIndexes(double[][]? coordinates, double x, double y, double z, System.Span<int> indexes, System.Span<double> distancesSquared);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndex.NearestIndexes(double[][],double,double,double,System.Span_int_,System.Span_double_).coordinates'></a>
+
+`coordinates` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The coordinate arrays of the cloud the index was built for\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndex.NearestIndexes(double[][],double,double,double,System.Span_int_,System.Span_double_).x'></a>
+
+`x` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+The X coordinate of the query position\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndex.NearestIndexes(double[][],double,double,double,System.Span_int_,System.Span_double_).y'></a>
+
+`y` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+The Y coordinate of the query position\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndex.NearestIndexes(double[][],double,double,double,System.Span_int_,System.Span_double_).z'></a>
+
+`z` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+The Z coordinate of the query position\. Ignored for a planar index\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndex.NearestIndexes(double[][],double,double,double,System.Span_int_,System.Span_double_).indexes'></a>
+
+`indexes` [System\.Span&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')
+
+A buffer receiving the point indexes, nearest first\. Its length is the number of neighbours requested\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndex.NearestIndexes(double[][],double,double,double,System.Span_int_,System.Span_double_).distancesSquared'></a>
+
+`distancesSquared` [System\.Span&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')[System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')
+
+A buffer receiving the matching squared distances, which must be at least as long as [indexes](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndex.NearestIndexes(double[][],double,double,double,System.Span_int_,System.Span_double_).indexes 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudIndex\.NearestIndexes\(double\[\]\[\], double, double, double, System\.Span\<int\>, System\.Span\<double\>\)\.indexes')\.
+
+#### Returns
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')  
+The number of neighbours written, which is smaller than the requested count when the cloud holds fewer points, or \-1 when the input is mismatched or the traversal stack overflowed\.
 
 <a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudMeshSolver_TPointCloud,TMesh_'></a>
 
@@ -926,3 +1028,86 @@ public readonly int Start;
 
 #### Field Value
 [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudNeighbor'></a>
+
+## PointCloudNeighbor Struct
+
+Represents one result of a nearest neighbour query: the index of a point within its cloud, together with its squared distance from the query position\.
+
+The distance is held squared because that is what the search actually computes. A nearest neighbour search compares distances, never uses them, and squaring is monotonic, so every comparison along the way is exact and the square root is deferred until a caller asks for one. On a query that examines a few hundred candidates this removes a few hundred square roots from the hot path.
+
+A plain readonly struct rather than a record struct: the target framework has no `IsExternalInit`, so init-only accessors would need a shim, and the type has no use for value equality that the two fields do not already provide by inspection. This matches [PointCloudIndexNode](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndexNode 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudIndexNode') and [Point](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D.Point 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.PointCloud3D\.Point').
+
+```csharp
+public readonly struct PointCloudNeighbor
+```
+### Constructors
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudNeighbor.PointCloudNeighbor(int,double)'></a>
+
+## PointCloudNeighbor\(int, double\) Constructor
+
+Initializes a new instance of the [PointCloudNeighbor](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudNeighbor 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudNeighbor') struct\.
+
+```csharp
+public PointCloudNeighbor(int index, double distanceSquared);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudNeighbor.PointCloudNeighbor(int,double).index'></a>
+
+`index` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+The zero\-based index of the point within its cloud\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudNeighbor.PointCloudNeighbor(int,double).distanceSquared'></a>
+
+`distanceSquared` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+The squared distance from the query position to the point\.
+### Properties
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudNeighbor.Distance'></a>
+
+## PointCloudNeighbor\.Distance Property
+
+Gets the distance from the query position to the point\.
+
+Computed on demand. Prefer [DistanceSquared](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudNeighbor.DistanceSquared 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudNeighbor\.DistanceSquared') when the value is only being compared against another distance from the same query.
+
+```csharp
+public double Distance { get; }
+```
+
+#### Property Value
+[System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')  
+A [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double') distance\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudNeighbor.DistanceSquared'></a>
+
+## PointCloudNeighbor\.DistanceSquared Property
+
+Gets the squared distance from the query position to the point\.
+
+```csharp
+public double DistanceSquared { get; }
+```
+
+#### Property Value
+[System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')  
+A [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double') squared distance, or [System\.Double\.PositiveInfinity](https://learn.microsoft.com/en-us/dotnet/api/system.double.positiveinfinity 'System\.Double\.PositiveInfinity') when the neighbour is unset\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudNeighbor.Index'></a>
+
+## PointCloudNeighbor\.Index Property
+
+Gets the zero\-based index of the point within its cloud\.
+
+```csharp
+public int Index { get; }
+```
+
+#### Property Value
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')  
+An [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32') point index, or \-1 when the neighbour is unset\.

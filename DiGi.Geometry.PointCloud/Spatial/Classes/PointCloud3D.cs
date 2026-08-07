@@ -11,7 +11,7 @@ namespace DiGi.Geometry.PointCloud.Spatial.Classes
     /// <para>See <see cref="Core.Classes.PointCloud"/> for why the storage is coordinate-major rather than a list of <see cref="Point3D"/> objects, and for the concurrency contract.</para>
     /// <para>Construct through <see cref="Create.PointCloud3D(IEnumerable{Point3D})"/> when the input may contain non-finite coordinates. The constructors here only assign and copy; the factory performs the filtering.</para>
     /// </summary>
-    public class PointCloud3D : Core.Classes.PointCloud, IGeometry3D, IBoundable3D, ICollectable3D, ITransformable3D
+    public partial class PointCloud3D : Core.Classes.PointCloud, IGeometry3D, IBoundable3D, ICollectable3D, ITransformable3D
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PointCloud3D"/> class from a <see cref="JsonObject"/>.
@@ -344,126 +344,6 @@ namespace DiGi.Geometry.PointCloud.Spatial.Classes
             }
 
             return [x, y, z];
-        }
-
-        /// <summary>
-        /// Represents a single point of a <see cref="PointCloud3D"/> as a value.
-        /// <para>A plain readonly struct rather than a ref struct: a point holds three doubles and no reference, so the ref struct restrictions would buy nothing while preventing use in generics, lambdas, arrays and lists.</para>
-        /// </summary>
-        public readonly struct Point
-        {
-            private readonly double x;
-            private readonly double y;
-            private readonly double z;
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="Point"/> struct.
-            /// </summary>
-            /// <param name="x">The X coordinate.</param>
-            /// <param name="y">The Y coordinate.</param>
-            /// <param name="z">The Z coordinate.</param>
-            public Point(double x, double y, double z)
-            {
-                this.x = x;
-                this.y = y;
-                this.z = z;
-            }
-
-            /// <summary>
-            /// Gets the X coordinate.
-            /// </summary>
-            /// <value>A <see cref="double"/> holding the X coordinate.</value>
-            public double X
-            {
-                get
-                {
-                    return x;
-                }
-            }
-
-            /// <summary>
-            /// Gets the Y coordinate.
-            /// </summary>
-            /// <value>A <see cref="double"/> holding the Y coordinate.</value>
-            public double Y
-            {
-                get
-                {
-                    return y;
-                }
-            }
-
-            /// <summary>
-            /// Gets the Z coordinate.
-            /// </summary>
-            /// <value>A <see cref="double"/> holding the Z coordinate.</value>
-            public double Z
-            {
-                get
-                {
-                    return z;
-                }
-            }
-
-            /// <summary>
-            /// Materializes this value as a <see cref="Point3D"/> object.
-            /// </summary>
-            /// <returns>A new <see cref="Point3D"/>.</returns>
-            public Point3D ToPoint3D()
-            {
-                return new Point3D(x, y, z);
-            }
-        }
-
-        /// <summary>
-        /// Walks a <see cref="PointCloud3D"/> one point at a time without allocating.
-        /// <para>A plain struct rather than a ref struct, so it remains usable inside iterators, lambdas and asynchronous methods. The span-based counterpart lives on <see cref="PointCloud3DView"/>.</para>
-        /// </summary>
-        public struct Enumerator
-        {
-            private readonly double[]? x;
-            private readonly double[]? y;
-            private readonly double[]? z;
-            private readonly int count;
-            private int index;
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="Enumerator"/> struct.
-            /// </summary>
-            /// <param name="pointCloud3D">The cloud to walk.</param>
-            public Enumerator(PointCloud3D? pointCloud3D)
-            {
-                double[][]? coordinates = pointCloud3D?.GetCoordinates(false);
-
-                x = coordinates?[0];
-                y = coordinates?[1];
-                z = coordinates?[2];
-                count = x == null ? 0 : x.Length;
-                index = -1;
-            }
-
-            /// <summary>
-            /// Gets the point at the current position.
-            /// </summary>
-            /// <value>A <see cref="Point"/> holding the current coordinates.</value>
-            public Point Current
-            {
-                get
-                {
-                    return new Point(x![index], y![index], z![index]);
-                }
-            }
-
-            /// <summary>
-            /// Advances to the next point.
-            /// </summary>
-            /// <returns><see langword="true"/> when a further point is available; otherwise <see langword="false"/>.</returns>
-            public bool MoveNext()
-            {
-                index++;
-
-                return index < count;
-            }
         }
     }
 }

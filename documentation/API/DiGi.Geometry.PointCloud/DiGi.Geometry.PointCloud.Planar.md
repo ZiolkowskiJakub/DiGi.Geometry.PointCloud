@@ -198,6 +198,125 @@ The file to read\.
 [PointCloud2D](DiGi.Geometry.PointCloud.Planar.Classes.md#DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D 'DiGi\.Geometry\.PointCloud\.Planar\.Classes\.PointCloud2D')  
 A new [PointCloud2D](DiGi.Geometry.PointCloud.Planar.Classes.md#DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D 'DiGi\.Geometry\.PointCloud\.Planar\.Classes\.PointCloud2D'), or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the file could not be read or decoded\.
 
+<a name='DiGi.Geometry.PointCloud.Planar.Create.Triangle2D(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,DiGi.Geometry.Planar.Classes.Point2D,double)'></a>
+
+## Create\.Triangle2D\(this PointCloud2D, Point2D, double\) Method
+
+Builds a [DiGi\.Geometry\.Planar\.Classes\.Triangle2D](https://learn.microsoft.com/en-us/dotnet/api/digi.geometry.planar.classes.triangle2d 'DiGi\.Geometry\.Planar\.Classes\.Triangle2D') from the points of a cloud nearest to a query point\.
+
+```csharp
+public static DiGi.Geometry.Planar.Classes.Triangle2D? Triangle2D(this DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D? pointCloud2D, DiGi.Geometry.Planar.Classes.Point2D? point2D, double tolerance=1E-06);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Planar.Create.Triangle2D(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,DiGi.Geometry.Planar.Classes.Point2D,double).pointCloud2D'></a>
+
+`pointCloud2D` [PointCloud2D](DiGi.Geometry.PointCloud.Planar.Classes.md#DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D 'DiGi\.Geometry\.PointCloud\.Planar\.Classes\.PointCloud2D')
+
+The cloud to take the corners from\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Create.Triangle2D(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,DiGi.Geometry.Planar.Classes.Point2D,double).point2D'></a>
+
+`point2D` [DiGi\.Geometry\.Planar\.Classes\.Point2D](https://learn.microsoft.com/en-us/dotnet/api/digi.geometry.planar.classes.point2d 'DiGi\.Geometry\.Planar\.Classes\.Point2D')
+
+The query point\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Create.Triangle2D(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,DiGi.Geometry.Planar.Classes.Point2D,double).tolerance'></a>
+
+`tolerance` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+The distance below which the third corner counts as lying on the line through the other two\.
+
+#### Returns
+[DiGi\.Geometry\.Planar\.Classes\.Triangle2D](https://learn.microsoft.com/en-us/dotnet/api/digi.geometry.planar.classes.triangle2d 'DiGi\.Geometry\.Planar\.Classes\.Triangle2D')  
+A new [DiGi\.Geometry\.Planar\.Classes\.Triangle2D](https://learn.microsoft.com/en-us/dotnet/api/digi.geometry.planar.classes.triangle2d 'DiGi\.Geometry\.Planar\.Classes\.Triangle2D'), or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the cloud holds too few points or offers no non\-degenerate triple\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Create.Triangle2D(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double,double,double)'></a>
+
+## Create\.Triangle2D\(this PointCloud2D, double, double, double\) Method
+
+Builds a [DiGi\.Geometry\.Planar\.Classes\.Triangle2D](https://learn.microsoft.com/en-us/dotnet/api/digi.geometry.planar.classes.triangle2d 'DiGi\.Geometry\.Planar\.Classes\.Triangle2D') from the points of a cloud nearest to a query position\.
+
+The three nearest points are taken first, and are used as they are whenever they form a usable triangle. They frequently do not: a query sitting on a scan line or a grid line of the source data has three nearest points that are exactly collinear, and three collinear points enclose no area. Rather than fail there, the search collects [MaximumNeighborCandidateCount](DiGi.Geometry.PointCloud.Core.Constants.md#DiGi.Geometry.PointCloud.Core.Constants.PointCloud.MaximumNeighborCandidateCount 'DiGi\.Geometry\.PointCloud\.Core\.Constants\.PointCloud\.MaximumNeighborCandidateCount') neighbours in one traversal and steps through the pairs beyond the first until a triple stands clear of a line. Those extra neighbours come from leaves the traversal already visited, so the widening costs a handful of comparisons and no second search.
+
+The nearest point always stays as a corner. Any candidate that would displace it is a duplicate of it, which is interchangeable, so anchoring there costs nothing and keeps the triangle attached to the point the caller actually asked about.
+
+Everything up to the result allocates nothing: the candidate set is stack-allocated and the corners are selected from raw coordinates. The three [DiGi\.Geometry\.Planar\.Classes\.Point2D](https://learn.microsoft.com/en-us/dotnet/api/digi.geometry.planar.classes.point2d 'DiGi\.Geometry\.Planar\.Classes\.Point2D') objects are created only once a triangle is known to exist.
+
+```csharp
+public static DiGi.Geometry.Planar.Classes.Triangle2D? Triangle2D(this DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D? pointCloud2D, double x, double y, double tolerance=1E-06);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Planar.Create.Triangle2D(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double,double,double).pointCloud2D'></a>
+
+`pointCloud2D` [PointCloud2D](DiGi.Geometry.PointCloud.Planar.Classes.md#DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D 'DiGi\.Geometry\.PointCloud\.Planar\.Classes\.PointCloud2D')
+
+The cloud to take the corners from\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Create.Triangle2D(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double,double,double).x'></a>
+
+`x` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+The X coordinate of the query position\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Create.Triangle2D(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double,double,double).y'></a>
+
+`y` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+The Y coordinate of the query position\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Create.Triangle2D(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double,double,double).tolerance'></a>
+
+`tolerance` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+The distance below which the third corner counts as lying on the line through the other two\.
+
+#### Returns
+[DiGi\.Geometry\.Planar\.Classes\.Triangle2D](https://learn.microsoft.com/en-us/dotnet/api/digi.geometry.planar.classes.triangle2d 'DiGi\.Geometry\.Planar\.Classes\.Triangle2D')  
+A new [DiGi\.Geometry\.Planar\.Classes\.Triangle2D](https://learn.microsoft.com/en-us/dotnet/api/digi.geometry.planar.classes.triangle2d 'DiGi\.Geometry\.Planar\.Classes\.Triangle2D'), or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the cloud holds too few points or offers no non\-degenerate triple\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Create.Triangle2Ds(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double)'></a>
+
+## Create\.Triangle2Ds\(this PointCloud2D, PointCloud2D, double\) Method
+
+Builds one [DiGi\.Geometry\.Planar\.Classes\.Triangle2D](https://learn.microsoft.com/en-us/dotnet/api/digi.geometry.planar.classes.triangle2d 'DiGi\.Geometry\.Planar\.Classes\.Triangle2D') per point of a query cloud from the points of a source cloud nearest to it\.
+
+This is where a many-core machine earns its keep. A single query is answered by a descent over a few dozen nodes and finishes in microseconds, so parallelising one would cost more in dispatch than the whole search; a batch of queries is a different problem entirely. Each query is independent, reads a shared index that is never written, and writes to its own slot of the result, so there is no shared mutable state, no lock and no contention.
+
+The index is built once before the fan-out. Its lazy construction is thread safe, but arriving at it with every worker at once would leave all but one of them waiting on the lock for the build.
+
+The partitioning uses every processor rather than the fraction the bulk coordinate passes use. Those are limited by memory bandwidth and saturate well before every core is busy; a descent walks a small, cache-resident node table and is bound by latency and arithmetic instead, so it keeps scaling.
+
+The result is aligned with the query cloud, one entry per query point in the same order, holding [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') wherever no non-degenerate triple exists. Compacting the nulls away would break the correspondence that makes the result usable.
+
+```csharp
+public static System.Collections.Generic.List<DiGi.Geometry.Planar.Classes.Triangle2D?>? Triangle2Ds(this DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D? pointCloud2D, DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D? pointCloud2D_Query, double tolerance=1E-06);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Planar.Create.Triangle2Ds(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double).pointCloud2D'></a>
+
+`pointCloud2D` [PointCloud2D](DiGi.Geometry.PointCloud.Planar.Classes.md#DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D 'DiGi\.Geometry\.PointCloud\.Planar\.Classes\.PointCloud2D')
+
+The cloud to take the corners from\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Create.Triangle2Ds(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double).pointCloud2D_Query'></a>
+
+`pointCloud2D_Query` [PointCloud2D](DiGi.Geometry.PointCloud.Planar.Classes.md#DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D 'DiGi\.Geometry\.PointCloud\.Planar\.Classes\.PointCloud2D')
+
+The cloud of query positions\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Create.Triangle2Ds(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double).tolerance'></a>
+
+`tolerance` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+The distance below which the third corner counts as lying on the line through the other two\.
+
+#### Returns
+[System\.Collections\.Generic\.List&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[DiGi\.Geometry\.Planar\.Classes\.Triangle2D](https://learn.microsoft.com/en-us/dotnet/api/digi.geometry.planar.classes.triangle2d 'DiGi\.Geometry\.Planar\.Classes\.Triangle2D')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')  
+A [System\.Collections\.Generic\.List&lt;&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1') holding one [DiGi\.Geometry\.Planar\.Classes\.Triangle2D](https://learn.microsoft.com/en-us/dotnet/api/digi.geometry.planar.classes.triangle2d 'DiGi\.Geometry\.Planar\.Classes\.Triangle2D') per query point, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when either cloud is empty\.
+
 <a name='DiGi.Geometry.PointCloud.Planar.Query'></a>
 
 ## Query Class
@@ -388,3 +507,140 @@ The distance by which the box is widened on every axis\.
 #### Returns
 [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')  
 A two element [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double') array holding the widened lower bounds\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Query.NearestIndexes(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double,double,System.Span_int_,System.Span_double_)'></a>
+
+## Query\.NearestIndexes\(this PointCloud2D, double, double, Span\<int\>, Span\<double\>\) Method
+
+Retrieves the indexes of the points of a cloud closest to a query position, nearest first\.
+
+Allocation free. The caller owns the result buffers, which are typically stack-allocated.
+
+```csharp
+public static int NearestIndexes(this DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D? pointCloud2D, double x, double y, System.Span<int> indexes, System.Span<double> distancesSquared);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Planar.Query.NearestIndexes(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double,double,System.Span_int_,System.Span_double_).pointCloud2D'></a>
+
+`pointCloud2D` [PointCloud2D](DiGi.Geometry.PointCloud.Planar.Classes.md#DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D 'DiGi\.Geometry\.PointCloud\.Planar\.Classes\.PointCloud2D')
+
+The cloud to search\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Query.NearestIndexes(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double,double,System.Span_int_,System.Span_double_).x'></a>
+
+`x` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+The X coordinate of the query position\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Query.NearestIndexes(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double,double,System.Span_int_,System.Span_double_).y'></a>
+
+`y` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+The Y coordinate of the query position\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Query.NearestIndexes(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double,double,System.Span_int_,System.Span_double_).indexes'></a>
+
+`indexes` [System\.Span&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')
+
+A buffer receiving the point indexes, nearest first\. Its length is the number of neighbours requested\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Query.NearestIndexes(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double,double,System.Span_int_,System.Span_double_).distancesSquared'></a>
+
+`distancesSquared` [System\.Span&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')[System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.span-1 'System\.Span\`1')
+
+A buffer receiving the matching squared distances, which must be at least as long as [indexes](DiGi.Geometry.PointCloud.Planar.md#DiGi.Geometry.PointCloud.Planar.Query.NearestIndexes(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double,double,System.Span_int_,System.Span_double_).indexes 'DiGi\.Geometry\.PointCloud\.Planar\.Query\.NearestIndexes\(this DiGi\.Geometry\.PointCloud\.Planar\.Classes\.PointCloud2D, double, double, System\.Span\<int\>, System\.Span\<double\>\)\.indexes')\.
+
+#### Returns
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')  
+The number of neighbours written, or \-1 when the cloud is empty or the request is mismatched\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Query.NearestNeighbors(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,DiGi.Geometry.Planar.Classes.Point2D,int)'></a>
+
+## Query\.NearestNeighbors\(this PointCloud2D, Point2D, int\) Method
+
+Retrieves the points of a cloud closest to a query point, nearest first, together with their distances\.
+
+The convenience form. It allocates the result list, so prefer [NearestIndexes\(this PointCloud2D, double, double, Span&lt;int&gt;, Span&lt;double&gt;\)](DiGi.Geometry.PointCloud.Planar.md#DiGi.Geometry.PointCloud.Planar.Query.NearestIndexes(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double,double,System.Span_int_,System.Span_double_) 'DiGi\.Geometry\.PointCloud\.Planar\.Query\.NearestIndexes\(this DiGi\.Geometry\.PointCloud\.Planar\.Classes\.PointCloud2D, double, double, System\.Span\<int\>, System\.Span\<double\>\)') inside a loop over many query positions.
+
+```csharp
+public static System.Collections.Generic.List<DiGi.Geometry.PointCloud.Core.Classes.PointCloudNeighbor>? NearestNeighbors(this DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D? pointCloud2D, DiGi.Geometry.Planar.Classes.Point2D? point2D, int count);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Planar.Query.NearestNeighbors(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,DiGi.Geometry.Planar.Classes.Point2D,int).pointCloud2D'></a>
+
+`pointCloud2D` [PointCloud2D](DiGi.Geometry.PointCloud.Planar.Classes.md#DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D 'DiGi\.Geometry\.PointCloud\.Planar\.Classes\.PointCloud2D')
+
+The cloud to search\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Query.NearestNeighbors(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,DiGi.Geometry.Planar.Classes.Point2D,int).point2D'></a>
+
+`point2D` [DiGi\.Geometry\.Planar\.Classes\.Point2D](https://learn.microsoft.com/en-us/dotnet/api/digi.geometry.planar.classes.point2d 'DiGi\.Geometry\.Planar\.Classes\.Point2D')
+
+The query point\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Query.NearestNeighbors(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,DiGi.Geometry.Planar.Classes.Point2D,int).count'></a>
+
+`count` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+The number of neighbours to retrieve\.
+
+#### Returns
+[System\.Collections\.Generic\.List&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[PointCloudNeighbor](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudNeighbor 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudNeighbor')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')  
+A [System\.Collections\.Generic\.List&lt;&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1') of [PointCloudNeighbor](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudNeighbor 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudNeighbor') ordered nearest first, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the cloud is empty or the count is not positive\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Query.TryGetNearestIndexes(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double,double,int,int,int)'></a>
+
+## Query\.TryGetNearestIndexes\(this PointCloud2D, double, double, int, int, int\) Method
+
+Retrieves the indexes of the three points of a cloud closest to a query position\.
+
+The whole search allocates nothing. The query is taken as two loose coordinates rather than a [DiGi\.Geometry\.Planar\.Classes\.Point2D](https://learn.microsoft.com/en-us/dotnet/api/digi.geometry.planar.classes.point2d 'DiGi\.Geometry\.Planar\.Classes\.Point2D') so that a caller sweeping many positions never constructs one, and the three results are returned as separate values rather than a collection so that nothing is constructed on the way out either.
+
+Three neighbours are what a triangle needs, which is why this exact arity is worth a dedicated member. Use [NearestIndexes\(this PointCloud2D, double, double, Span&lt;int&gt;, Span&lt;double&gt;\)](DiGi.Geometry.PointCloud.Planar.md#DiGi.Geometry.PointCloud.Planar.Query.NearestIndexes(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double,double,System.Span_int_,System.Span_double_) 'DiGi\.Geometry\.PointCloud\.Planar\.Query\.NearestIndexes\(this DiGi\.Geometry\.PointCloud\.Planar\.Classes\.PointCloud2D, double, double, System\.Span\<int\>, System\.Span\<double\>\)') for any other count.
+
+```csharp
+public static bool TryGetNearestIndexes(this DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D? pointCloud2D, double x, double y, out int index_1, out int index_2, out int index_3);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Planar.Query.TryGetNearestIndexes(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double,double,int,int,int).pointCloud2D'></a>
+
+`pointCloud2D` [PointCloud2D](DiGi.Geometry.PointCloud.Planar.Classes.md#DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D 'DiGi\.Geometry\.PointCloud\.Planar\.Classes\.PointCloud2D')
+
+The cloud to search\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Query.TryGetNearestIndexes(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double,double,int,int,int).x'></a>
+
+`x` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+The X coordinate of the query position\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Query.TryGetNearestIndexes(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double,double,int,int,int).y'></a>
+
+`y` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+The Y coordinate of the query position\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Query.TryGetNearestIndexes(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double,double,int,int,int).index_1'></a>
+
+`index_1` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+When this method returns, contains the index of the closest point\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Query.TryGetNearestIndexes(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double,double,int,int,int).index_2'></a>
+
+`index_2` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+When this method returns, contains the index of the second closest point\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Query.TryGetNearestIndexes(thisDiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D,double,double,int,int,int).index_3'></a>
+
+`index_3` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+When this method returns, contains the index of the third closest point\.
+
+#### Returns
+[System\.Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean 'System\.Boolean')  
+[true](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/bool 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/builtin\-types/bool') when three distinct points were found; otherwise [false](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/bool 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/builtin\-types/bool')\.

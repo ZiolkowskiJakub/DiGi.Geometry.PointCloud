@@ -165,6 +165,21 @@ public const int MaximumDepth3D = 7;
 #### Field Value
 [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
 
+<a name='DiGi.Geometry.PointCloud.Core.Constants.PointCloud.MaximumNeighborCandidateCount'></a>
+
+## PointCloud\.MaximumNeighborCandidateCount Field
+
+The number of nearest neighbours collected when a non\-degenerate triple is required\.
+
+Three points are enough only when they are not collinear, which fails whenever the query sits on a scan line or a grid line of the source data. Collecting this many candidates lets the triangle factory step past a degenerate pair without a second traversal: the extra neighbours come from leaves that are already resident, so the additional cost is a handful of comparisons.
+
+```csharp
+public const int MaximumNeighborCandidateCount = 8;
+```
+
+#### Field Value
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
 <a name='DiGi.Geometry.PointCloud.Core.Constants.PointCloud.MinimumDepth'></a>
 
 ## PointCloud\.MinimumDepth Field
@@ -203,6 +218,21 @@ Lower than [ParallelThreshold](DiGi.Geometry.PointCloud.Core.Constants.md#DiGi.G
 
 ```csharp
 public const int ParallelThresholdIndex = 50000;
+```
+
+#### Field Value
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+<a name='DiGi.Geometry.PointCloud.Core.Constants.PointCloud.ParallelThresholdNeighbor'></a>
+
+## PointCloud\.ParallelThresholdNeighbor Field
+
+The minimum number of query points at which a batch nearest neighbour search is worth parallelising\.
+
+An indexed descent for a single query costs roughly one to three microseconds, so a partition of this size carries well over a millisecond of work against a dispatch cost of 5-20 microseconds. Unlike the streaming passes this workload is latency bound rather than bandwidth bound, so it is partitioned across every processor rather than the streaming fraction.
+
+```csharp
+public const int ParallelThresholdNeighbor = 1024;
 ```
 
 #### Field Value
