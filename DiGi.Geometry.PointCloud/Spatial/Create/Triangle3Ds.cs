@@ -8,7 +8,7 @@ namespace DiGi.Geometry.PointCloud.Spatial
     public static partial class Create
     {
         /// <summary>
-        /// Builds one <see cref="DiGi.Geometry.Spatial.Classes.Triangle3D"/> per point of a query cloud from the points of a source cloud nearest to it.
+        /// Builds one <see cref="Geometry.Spatial.Classes.Triangle3D"/> per point of a query cloud from the points of a source cloud nearest to it.
         /// <para>This is where a many-core machine earns its keep. A single query is answered by a descent over a few dozen nodes and finishes in microseconds, so parallelising one would cost more in dispatch than the whole search; a batch of queries is a different problem entirely. Each query is independent, reads a shared index that is never written, and writes to its own slot of the result, so there is no shared mutable state, no lock and no contention.</para>
         /// <para>The index is built once before the fan-out. Its lazy construction is thread safe, but arriving at it with every worker at once would leave all but one of them waiting on the lock for the build.</para>
         /// <para>The partitioning uses every processor rather than the fraction the bulk coordinate passes use. Those are limited by memory bandwidth and saturate well before every core is busy; a descent walks a small, cache-resident node table and is bound by latency and arithmetic instead, so it keeps scaling.</para>
@@ -17,7 +17,7 @@ namespace DiGi.Geometry.PointCloud.Spatial
         /// <param name="pointCloud3D">The cloud to take the corners from.</param>
         /// <param name="pointCloud3D_Query">The cloud of query positions.</param>
         /// <param name="tolerance">The distance below which the third corner counts as lying on the line through the other two.</param>
-        /// <returns>A <see cref="List{T}"/> holding one <see cref="DiGi.Geometry.Spatial.Classes.Triangle3D"/> per query point, or <see langword="null"/> when either cloud is empty.</returns>
+        /// <returns>A <see cref="List{T}"/> holding one <see cref="Geometry.Spatial.Classes.Triangle3D"/> per query point, or <see langword="null"/> when either cloud is empty.</returns>
         public static List<Triangle3D?>? Triangle3Ds(this PointCloud3D? pointCloud3D, PointCloud3D? pointCloud3D_Query, double tolerance = DiGi.Core.Constants.Tolerance.Distance)
         {
             double[][]? coordinates_Query = pointCloud3D_Query?.GetCoordinates(false);

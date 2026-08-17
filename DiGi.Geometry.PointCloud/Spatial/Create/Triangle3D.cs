@@ -7,12 +7,12 @@ namespace DiGi.Geometry.PointCloud.Spatial
     public static partial class Create
     {
         /// <summary>
-        /// Builds a <see cref="DiGi.Geometry.Spatial.Classes.Triangle3D"/> from the points of a cloud nearest to a query point.
+        /// Builds a <see cref="Geometry.Spatial.Classes.Triangle3D"/> from the points of a cloud nearest to a query point.
         /// </summary>
         /// <param name="pointCloud3D">The cloud to take the corners from.</param>
         /// <param name="point3D">The query point.</param>
         /// <param name="tolerance">The distance below which the third corner counts as lying on the line through the other two.</param>
-        /// <returns>A new <see cref="DiGi.Geometry.Spatial.Classes.Triangle3D"/>, or <see langword="null"/> when the cloud holds too few points or offers no non-degenerate triple.</returns>
+        /// <returns>A new <see cref="Geometry.Spatial.Classes.Triangle3D"/>, or <see langword="null"/> when the cloud holds too few points or offers no non-degenerate triple.</returns>
         public static Triangle3D? Triangle3D(this PointCloud3D? pointCloud3D, Point3D? point3D, double tolerance = DiGi.Core.Constants.Tolerance.Distance)
         {
             if (pointCloud3D == null || point3D == null)
@@ -24,7 +24,7 @@ namespace DiGi.Geometry.PointCloud.Spatial
         }
 
         /// <summary>
-        /// Builds a <see cref="DiGi.Geometry.Spatial.Classes.Triangle3D"/> from the points of a cloud nearest to a query position.
+        /// Builds a <see cref="Geometry.Spatial.Classes.Triangle3D"/> from the points of a cloud nearest to a query position.
         /// <para>The three nearest points are taken first, and are used as they are whenever they form a usable triangle. They frequently do not: a query sitting on a scan line or a grid line of the source data has three nearest points that are exactly collinear, and three collinear points describe no plane. Rather than fail there, the search collects <see cref="Core.Constants.PointCloud.MaximumNeighborCandidateCount"/> neighbours in one traversal and steps through the pairs beyond the first until a triple stands clear of a line. Those extra neighbours come from leaves the traversal already visited, so the widening costs a handful of comparisons and no second search.</para>
         /// <para>The nearest point always stays as a corner. Any candidate that would displace it is a duplicate of it, which is interchangeable, so anchoring there costs nothing and keeps the triangle attached to the point the caller actually asked about.</para>
         /// <para>Everything up to the result allocates nothing: the candidate set is stack-allocated and the corners are selected from raw coordinates. The three <see cref="Point3D"/> objects are created only once a triangle is known to exist.</para>
@@ -34,7 +34,7 @@ namespace DiGi.Geometry.PointCloud.Spatial
         /// <param name="y">The Y coordinate of the query position.</param>
         /// <param name="z">The Z coordinate of the query position.</param>
         /// <param name="tolerance">The distance below which the third corner counts as lying on the line through the other two.</param>
-        /// <returns>A new <see cref="DiGi.Geometry.Spatial.Classes.Triangle3D"/>, or <see langword="null"/> when the cloud holds too few points or offers no non-degenerate triple.</returns>
+        /// <returns>A new <see cref="Geometry.Spatial.Classes.Triangle3D"/>, or <see langword="null"/> when the cloud holds too few points or offers no non-degenerate triple.</returns>
         public static Triangle3D? Triangle3D(this PointCloud3D? pointCloud3D, double x, double y, double z, double tolerance = DiGi.Core.Constants.Tolerance.Distance)
         {
             double[][]? coordinates = pointCloud3D?.GetCoordinates(false);

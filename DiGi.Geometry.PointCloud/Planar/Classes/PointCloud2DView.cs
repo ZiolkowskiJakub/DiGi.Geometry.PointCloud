@@ -152,7 +152,7 @@ namespace DiGi.Geometry.PointCloud.Planar.Classes
             /// Gets the point at the current position.
             /// </summary>
             /// <value>A <see cref="PointCloud2D.Point"/> holding the current coordinates.</value>
-            public PointCloud2D.Point Current
+            public readonly PointCloud2D.Point Current
             {
                 get
                 {

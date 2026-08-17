@@ -840,6 +840,303 @@ Implements [Solve\(\)](https://learn.microsoft.com/en-us/dotnet/api/digi.core.in
 #### Returns
 [System\.Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean 'System\.Boolean')  
 [true](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/bool 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/builtin\-types/bool') when a mesh was produced; otherwise [false](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/bool 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/builtin\-types/bool')\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection'></a>
+
+## PointCloudReferenceCollection Class
+
+Represents the distinct model objects a point cloud links to, held as an ordered table in which the position of an entry is its identifier\.
+
+The table exists so that a link costs four bytes per point instead of a reference object per point. A reference is a heap object carrying a type reference and a cached string, so one per point would reproduce exactly the cost that [PointCloud](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloud 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloud') is built to avoid; a table holds one entry per distinct model object, which is thousands rather than millions.
+
+The table is add-free by design. Nothing can remove or reorder an entry, because a point cloud stores only the position of an entry and any shift would silently repoint every linked point at the wrong model object. Build the table once through [PointCloudReferenceCollection\(IEnumerable&lt;ISerializableReference&gt;\)](DiGi.Geometry.PointCloud.Core.md#DiGi.Geometry.PointCloud.Core.Create.PointCloudReferenceCollection(System.Collections.Generic.IEnumerable_DiGi.Core.Interfaces.ISerializableReference_) 'DiGi\.Geometry\.PointCloud\.Core\.Create\.PointCloudReferenceCollection\(System\.Collections\.Generic\.IEnumerable\<DiGi\.Core\.Interfaces\.ISerializableReference\>\)'), or let a cloud factory build it while it assigns identifiers.
+
+Entries are typed [DiGi\.Core\.Interfaces\.ISerializableReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.iserializablereference 'DiGi\.Core\.Interfaces\.ISerializableReference') rather than [DiGi\.Core\.Interfaces\.IUniqueReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.iuniquereference 'DiGi\.Core\.Interfaces\.IUniqueReference') on purpose. [DiGi\.Core\.Classes\.ComplexReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.classes.complexreference 'DiGi\.Core\.Classes\.ComplexReference') implements [DiGi\.Core\.Interfaces\.IComplexReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.icomplexreference 'DiGi\.Core\.Interfaces\.IComplexReference'), which does not derive from [DiGi\.Core\.Interfaces\.IUniqueReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.iuniquereference 'DiGi\.Core\.Interfaces\.IUniqueReference'), so the narrower interface would exclude the composite references that identify a component within a building within a county.
+
+```csharp
+public class PointCloudReferenceCollection : DiGi.Core.Classes.SerializableObject
+```
+
+Inheritance [System\.Object](https://learn.microsoft.com/en-us/dotnet/api/system.object 'System\.Object') → [DiGi\.Core\.Classes\.Object](https://learn.microsoft.com/en-us/dotnet/api/digi.core.classes.object 'DiGi\.Core\.Classes\.Object') → [DiGi\.Core\.Classes\.SerializableObject](https://learn.microsoft.com/en-us/dotnet/api/digi.core.classes.serializableobject 'DiGi\.Core\.Classes\.SerializableObject') → PointCloudReferenceCollection
+### Constructors
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.PointCloudReferenceCollection()'></a>
+
+## PointCloudReferenceCollection\(\) Constructor
+
+Initializes a new empty instance of the [PointCloudReferenceCollection](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudReferenceCollection') class\.
+
+```csharp
+public PointCloudReferenceCollection();
+```
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.PointCloudReferenceCollection(DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection)'></a>
+
+## PointCloudReferenceCollection\(PointCloudReferenceCollection\) Constructor
+
+Initializes a new instance of the [PointCloudReferenceCollection](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudReferenceCollection') class by copying an existing table\.
+
+Entries are cloned one by one so that the copy shares no reference object with the source, and identifiers are preserved because the order is preserved.
+
+```csharp
+public PointCloudReferenceCollection(DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection? pointCloudReferenceCollection);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.PointCloudReferenceCollection(DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection).pointCloudReferenceCollection'></a>
+
+`pointCloudReferenceCollection` [PointCloudReferenceCollection](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudReferenceCollection')
+
+The table to copy from\. This value can be null\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.PointCloudReferenceCollection(System.Collections.Generic.IEnumerable_DiGi.Core.Interfaces.ISerializableReference_)'></a>
+
+## PointCloudReferenceCollection\(IEnumerable\<ISerializableReference\>\) Constructor
+
+Initializes a new instance of the [PointCloudReferenceCollection](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudReferenceCollection') class from a sequence of references\.
+
+The sequence is copied in order and null entries are skipped, but it is NOT checked for duplicates; a duplicate would occupy two identifiers and quietly split one model object in two. Use [PointCloudReferenceCollection\(IEnumerable&lt;ISerializableReference&gt;\)](DiGi.Geometry.PointCloud.Core.md#DiGi.Geometry.PointCloud.Core.Create.PointCloudReferenceCollection(System.Collections.Generic.IEnumerable_DiGi.Core.Interfaces.ISerializableReference_) 'DiGi\.Geometry\.PointCloud\.Core\.Create\.PointCloudReferenceCollection\(System\.Collections\.Generic\.IEnumerable\<DiGi\.Core\.Interfaces\.ISerializableReference\>\)') to remove duplicates first.
+
+```csharp
+public PointCloudReferenceCollection(System.Collections.Generic.IEnumerable<DiGi.Core.Interfaces.ISerializableReference>? references);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.PointCloudReferenceCollection(System.Collections.Generic.IEnumerable_DiGi.Core.Interfaces.ISerializableReference_).references'></a>
+
+`references` [System\.Collections\.Generic\.IEnumerable&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1 'System\.Collections\.Generic\.IEnumerable\`1')[DiGi\.Core\.Interfaces\.ISerializableReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.iserializablereference 'DiGi\.Core\.Interfaces\.ISerializableReference')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1 'System\.Collections\.Generic\.IEnumerable\`1')
+
+The references to store, in identifier order\. This value can be null\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.PointCloudReferenceCollection(System.Text.Json.Nodes.JsonObject)'></a>
+
+## PointCloudReferenceCollection\(JsonObject\) Constructor
+
+Initializes a new instance of the [PointCloudReferenceCollection](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudReferenceCollection') class from a [System\.Text\.Json\.Nodes\.JsonObject](https://learn.microsoft.com/en-us/dotnet/api/system.text.json.nodes.jsonobject 'System\.Text\.Json\.Nodes\.JsonObject')\.
+
+```csharp
+public PointCloudReferenceCollection(System.Text.Json.Nodes.JsonObject? jsonObject);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.PointCloudReferenceCollection(System.Text.Json.Nodes.JsonObject).jsonObject'></a>
+
+`jsonObject` [System\.Text\.Json\.Nodes\.JsonObject](https://learn.microsoft.com/en-us/dotnet/api/system.text.json.nodes.jsonobject 'System\.Text\.Json\.Nodes\.JsonObject')
+
+The [System\.Text\.Json\.Nodes\.JsonObject](https://learn.microsoft.com/en-us/dotnet/api/system.text.json.nodes.jsonobject 'System\.Text\.Json\.Nodes\.JsonObject') holding the serialized table\. This value can be null\.
+### Fields
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.dictionary'></a>
+
+## PointCloudReferenceCollection\.dictionary Field
+
+The cached reverse lookup from reference to identifier, derived data that is rebuilt on demand and never serialized\.
+
+Built lazily rather than in a constructor for the same reason as [EnsureIndex\(\)](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloud.EnsureIndex() 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloud\.EnsureIndex\(\)'): constructing it is an order-of-count sweep and a caller who only ever resolves identifiers forwards should not pay for it.
+
+A plain field with no serialization attribute, which the reflection serializer skips: fields are opt-in, unlike properties, which are opt-out.
+
+```csharp
+private Dictionary<ISerializableReference,int>? dictionary;
+```
+
+#### Field Value
+[System\.Collections\.Generic\.Dictionary&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2 'System\.Collections\.Generic\.Dictionary\`2')[DiGi\.Core\.Interfaces\.ISerializableReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.iserializablereference 'DiGi\.Core\.Interfaces\.ISerializableReference')[,](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2 'System\.Collections\.Generic\.Dictionary\`2')[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2 'System\.Collections\.Generic\.Dictionary\`2')
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.object_DictionaryLock'></a>
+
+## PointCloudReferenceCollection\.object\_DictionaryLock Field
+
+Guards construction of the cached reverse lookup\.
+
+```csharp
+private readonly object object_DictionaryLock;
+```
+
+#### Field Value
+[System\.Object](https://learn.microsoft.com/en-us/dotnet/api/system.object 'System\.Object')
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.references'></a>
+
+## PointCloudReferenceCollection\.references Field
+
+The reference table, where the index of an entry is its identifier\.
+
+```csharp
+private readonly List<ISerializableReference> references;
+```
+
+#### Field Value
+[System\.Collections\.Generic\.List&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[DiGi\.Core\.Interfaces\.ISerializableReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.iserializablereference 'DiGi\.Core\.Interfaces\.ISerializableReference')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')
+### Properties
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.Count'></a>
+
+## PointCloudReferenceCollection\.Count Property
+
+Gets the number of entries in the table\.
+
+```csharp
+public int Count { get; }
+```
+
+#### Property Value
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')  
+An [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32') entry count of zero or more\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.References'></a>
+
+## PointCloudReferenceCollection\.References Property
+
+Gets every entry in the table, in identifier order\.
+
+Returns a copy, because handing out the internal list would let a caller reorder or remove an entry and silently repoint every linked point at the wrong model object. Use [GetReferences\(bool\)](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.GetReferences(bool) 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudReferenceCollection\.GetReferences\(bool\)') when the copy is not wanted.
+
+```csharp
+public System.Collections.Generic.List<DiGi.Core.Interfaces.ISerializableReference>? References { get; }
+```
+
+#### Property Value
+[System\.Collections\.Generic\.List&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[DiGi\.Core\.Interfaces\.ISerializableReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.iserializablereference 'DiGi\.Core\.Interfaces\.ISerializableReference')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')  
+A [System\.Collections\.Generic\.List&lt;&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1') of references, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the table is empty\.
+### Methods
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.Clone()'></a>
+
+## PointCloudReferenceCollection\.Clone\(\) Method
+
+Creates a copy of the current object\.
+
+Overridden to copy directly rather than through a JSON round trip, mirroring [PointCloud](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloud 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloud').
+
+```csharp
+public override DiGi.Core.Interfaces.ISerializableObject? Clone();
+```
+
+Implements [Clone\(\)](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.icloneableobject-1.clone 'DiGi\.Core\.Interfaces\.ICloneableObject\`1\.Clone')
+
+#### Returns
+[DiGi\.Core\.Interfaces\.ISerializableObject](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.iserializableobject 'DiGi\.Core\.Interfaces\.ISerializableObject')  
+A new [DiGi\.Core\.Interfaces\.ISerializableObject](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.iserializableobject 'DiGi\.Core\.Interfaces\.ISerializableObject') instance that is a clone of the current object\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.Contains(DiGi.Core.Interfaces.ISerializableReference)'></a>
+
+## PointCloudReferenceCollection\.Contains\(ISerializableReference\) Method
+
+Determines whether the table holds the specified reference\.
+
+```csharp
+public bool Contains(DiGi.Core.Interfaces.ISerializableReference? reference);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.Contains(DiGi.Core.Interfaces.ISerializableReference).reference'></a>
+
+`reference` [DiGi\.Core\.Interfaces\.ISerializableReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.iserializablereference 'DiGi\.Core\.Interfaces\.ISerializableReference')
+
+The reference to look for\.
+
+#### Returns
+[System\.Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean 'System\.Boolean')  
+[true](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/bool 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/builtin\-types/bool') when the reference is present; otherwise [false](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/bool 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/builtin\-types/bool')\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.GetReference(int)'></a>
+
+## PointCloudReferenceCollection\.GetReference\(int\) Method
+
+Retrieves the reference stored against an identifier\.
+
+```csharp
+public DiGi.Core.Interfaces.ISerializableReference? GetReference(int id);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.GetReference(int).id'></a>
+
+`id` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+The zero\-based identifier, which is the position of the entry in the table\.
+
+#### Returns
+[DiGi\.Core\.Interfaces\.ISerializableReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.iserializablereference 'DiGi\.Core\.Interfaces\.ISerializableReference')  
+A copy of the reference, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the identifier is out of range\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.GetReference(int,bool)'></a>
+
+## PointCloudReferenceCollection\.GetReference\(int, bool\) Method
+
+Retrieves the reference stored against an identifier, optionally without copying\.
+
+```csharp
+public DiGi.Core.Interfaces.ISerializableReference? GetReference(int id, bool clone);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.GetReference(int,bool).id'></a>
+
+`id` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+The zero\-based identifier, which is the position of the entry in the table\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.GetReference(int,bool).clone'></a>
+
+`clone` [System\.Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean 'System\.Boolean')
+
+When [true](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/bool 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/builtin\-types/bool'), a copy is returned; when [false](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/bool 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/builtin\-types/bool'), the stored reference is returned directly and must not be modified by the caller\.
+
+#### Returns
+[DiGi\.Core\.Interfaces\.ISerializableReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.iserializablereference 'DiGi\.Core\.Interfaces\.ISerializableReference')  
+The reference, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the identifier is out of range\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.GetReferences(bool)'></a>
+
+## PointCloudReferenceCollection\.GetReferences\(bool\) Method
+
+Retrieves every entry in the table, in identifier order\.
+
+```csharp
+public System.Collections.Generic.List<DiGi.Core.Interfaces.ISerializableReference>? GetReferences(bool clone);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.GetReferences(bool).clone'></a>
+
+`clone` [System\.Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean 'System\.Boolean')
+
+When [true](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/bool 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/builtin\-types/bool'), a deep copy is returned; when [false](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/bool 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/builtin\-types/bool'), the internal list is returned directly and must not be modified by the caller\.
+
+#### Returns
+[System\.Collections\.Generic\.List&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[DiGi\.Core\.Interfaces\.ISerializableReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.iserializablereference 'DiGi\.Core\.Interfaces\.ISerializableReference')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')  
+A [System\.Collections\.Generic\.List&lt;&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1') of references, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the table is empty\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.TryGetId(DiGi.Core.Interfaces.ISerializableReference,int)'></a>
+
+## PointCloudReferenceCollection\.TryGetId\(ISerializableReference, int\) Method
+
+Retrieves the identifier stored against a reference\.
+
+Keying a dictionary on a reference is safe because [DiGi\.Core\.Classes\.SerializableReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.classes.serializablereference 'DiGi\.Core\.Classes\.SerializableReference') overrides both [System\.Object\.GetHashCode](https://learn.microsoft.com/en-us/dotnet/api/system.object.gethashcode 'System\.Object\.GetHashCode') and [System\.Object\.Equals\(System\.Object\)](https://learn.microsoft.com/en-us/dotnet/api/system.object.equals#system-object-equals(system-object) 'System\.Object\.Equals\(System\.Object\)'). Comparing two interface typed references with `==` is NOT safe, because the equality operators live on the class and interface typed operands fall through to reference equality.
+
+```csharp
+public bool TryGetId(DiGi.Core.Interfaces.ISerializableReference? reference, out int id);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.TryGetId(DiGi.Core.Interfaces.ISerializableReference,int).reference'></a>
+
+`reference` [DiGi\.Core\.Interfaces\.ISerializableReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.iserializablereference 'DiGi\.Core\.Interfaces\.ISerializableReference')
+
+The reference to look for\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection.TryGetId(DiGi.Core.Interfaces.ISerializableReference,int).id'></a>
+
+`id` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+When this method returns, contains the identifier, or \-1 when the reference is not in the table\.
+
+#### Returns
+[System\.Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean 'System\.Boolean')  
+[true](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/bool 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/builtin\-types/bool') when the reference was found; otherwise [false](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/bool 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/builtin\-types/bool')\.
 ### Structs
 
 <a name='DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndexNode'></a>

@@ -13,19 +13,39 @@ namespace DiGi.Geometry.PointCloud.Core
         /// <returns>A jagged <see cref="double"/> array holding one array per axis, or <see langword="null"/> when the buffer could not be decoded.</returns>
         public static double[][]? Coordinates(byte[]? bytes, int dimension = 0)
         {
-            if (bytes == null || bytes.Length < Constants.PointCloud.BinaryHeaderLength)
+            int length = Query.BinaryLength(bytes, 0);
+            if (length < 0 || length != bytes!.Length)
             {
                 return null;
             }
 
-            if (bytes[0] != Constants.PointCloud.BinaryMagic_0 || bytes[1] != Constants.PointCloud.BinaryMagic_1 || bytes[2] != Constants.PointCloud.BinaryMagic_2 || bytes[3] != Constants.PointCloud.BinaryMagic_3)
+            return Coordinates(bytes, dimension, 0);
+        }
+
+        /// <summary>
+        /// Decodes a coordinate-major point payload from a binary point cloud block starting at an offset inside a longer buffer.
+        /// <para>Unlike <see cref="Coordinates(byte[], int)"/> this accepts trailing bytes, because a block located by offset is expected to be followed by something: a file holding a cloud together with its per-point model object links stores the two blocks one after the other.</para>
+        /// <para>Every failure mode returns <see langword="null"/> rather than throwing, matching the exact length form.</para>
+        /// </summary>
+        /// <param name="bytes">The encoded buffer.</param>
+        /// <param name="dimension">The expected number of coordinate axes, or a value of zero or less to accept whatever the header declares.</param>
+        /// <param name="startIndex">The offset at which the block starts.</param>
+        /// <returns>A jagged <see cref="double"/> array holding one array per axis, or <see langword="null"/> when the block could not be decoded.</returns>
+        public static double[][]? Coordinates(byte[]? bytes, int dimension, int startIndex)
+        {
+            if (bytes == null || startIndex < 0 || startIndex > bytes.Length - Constants.PointCloud.BinaryHeaderLength)
+            {
+                return null;
+            }
+
+            if (bytes[startIndex] != Constants.PointCloud.BinaryMagic_0 || bytes[startIndex + 1] != Constants.PointCloud.BinaryMagic_1 || bytes[startIndex + 2] != Constants.PointCloud.BinaryMagic_2 || bytes[startIndex + 3] != Constants.PointCloud.BinaryMagic_3)
             {
                 return null;
             }
 
             int readUInt16(int offset)
             {
-                return bytes[offset] | (bytes[offset + 1] << 8);
+                return bytes[startIndex + offset] | (bytes[startIndex + offset + 1] << 8);
             }
 
             long readInt64(int offset)
@@ -33,7 +53,7 @@ namespace DiGi.Geometry.PointCloud.Core
                 long result_Temp = 0;
                 for (int i = 0; i < 8; i++)
                 {
-                    result_Temp |= (long)bytes[offset + i] << (i * 8);
+                    result_Temp |= (long)bytes[startIndex + offset + i] << (i * 8);
                 }
 
                 return result_Temp;
@@ -62,7 +82,7 @@ namespace DiGi.Geometry.PointCloud.Core
             }
 
             long length_Expected = Constants.PointCloud.BinaryHeaderLength + (count * dimension_Header * sizeof(double));
-            if (length_Expected != bytes.Length)
+            if (startIndex + length_Expected > bytes.Length)
             {
                 return null;
             }
@@ -72,7 +92,7 @@ namespace DiGi.Geometry.PointCloud.Core
 
             double[][] result = new double[dimension_Header][];
 
-            int offset_Axis = Constants.PointCloud.BinaryHeaderLength;
+            int offset_Axis = startIndex + Constants.PointCloud.BinaryHeaderLength;
             for (int i = 0; i < dimension_Header; i++)
             {
                 double[] values = new double[count_Points];

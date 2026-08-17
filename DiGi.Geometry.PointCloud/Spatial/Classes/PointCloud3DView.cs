@@ -171,7 +171,7 @@ namespace DiGi.Geometry.PointCloud.Spatial.Classes
             /// Gets the point at the current position.
             /// </summary>
             /// <value>A <see cref="PointCloud3D.Point"/> holding the current coordinates.</value>
-            public PointCloud3D.Point Current
+            public readonly PointCloud3D.Point Current
             {
                 get
                 {

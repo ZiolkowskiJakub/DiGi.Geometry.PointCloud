@@ -43,6 +43,39 @@ The representation to produce\.
 [System\.Byte](https://learn.microsoft.com/en-us/dotnet/api/system.byte 'System\.Byte')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')  
 A [System\.Byte](https://learn.microsoft.com/en-us/dotnet/api/system.byte 'System\.Byte') array holding the encoded cloud, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the cloud is null or empty\.
 
+<a name='DiGi.Geometry.PointCloud.Spatial.Convert.ToSystem_Bytes(thisDiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D,DiGi.Geometry.PointCloud.Core.Enums.PointCloudFormat)'></a>
+
+## Convert\.ToSystem\_Bytes\(this ReferencedPointCloud3D, PointCloudFormat\) Method
+
+Encodes a [ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D') into bytes in the requested representation, keeping the per\-point model object links\.
+
+The binary representation is the coordinate block followed by the identifier block, with the reference table embedded in the second one so that the file stands alone. The length of the first block follows entirely from its own header, which is how the reader finds where the second begins, so neither block needs a pointer to the other.
+
+A cloud carrying no links encodes to the coordinate block alone, which is byte-identical to what the base overload would produce.
+
+Note that this overload is selected only when the argument is typed as the referenced cloud at the call site, because extension methods bind statically. Through a variable typed [PointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.PointCloud3D') the base overload runs and the links are not written.
+
+```csharp
+public static byte[]? ToSystem_Bytes(this DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D? referencedPointCloud3D, DiGi.Geometry.PointCloud.Core.Enums.PointCloudFormat pointCloudFormat);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Convert.ToSystem_Bytes(thisDiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D,DiGi.Geometry.PointCloud.Core.Enums.PointCloudFormat).referencedPointCloud3D'></a>
+
+`referencedPointCloud3D` [ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D')
+
+The cloud to encode\.
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Convert.ToSystem_Bytes(thisDiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D,DiGi.Geometry.PointCloud.Core.Enums.PointCloudFormat).pointCloudFormat'></a>
+
+`pointCloudFormat` [PointCloudFormat](DiGi.Geometry.PointCloud.Core.Enums.md#DiGi.Geometry.PointCloud.Core.Enums.PointCloudFormat 'DiGi\.Geometry\.PointCloud\.Core\.Enums\.PointCloudFormat')
+
+The representation to produce\.
+
+#### Returns
+[System\.Byte](https://learn.microsoft.com/en-us/dotnet/api/system.byte 'System\.Byte')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')  
+A [System\.Byte](https://learn.microsoft.com/en-us/dotnet/api/system.byte 'System\.Byte') array holding the encoded cloud, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the cloud is null or empty\.
+
 <a name='DiGi.Geometry.PointCloud.Spatial.Create'></a>
 
 ## Create Class
@@ -205,6 +238,192 @@ The file to read\.
 #### Returns
 [PointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.PointCloud3D')  
 A new [PointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.PointCloud3D'), or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the file could not be read or decoded\.
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.ReferencedPointCloud3D(byte[])'></a>
+
+## Create\.ReferencedPointCloud3D\(byte\[\]\) Method
+
+Creates a [ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D') from a buffer holding a coordinate block optionally followed by an identifier block\.
+
+Never throws. A truncated, misaligned, foreign, wrong-dimension or future-versioned buffer yields [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null'), and a buffer holding coordinates alone yields a cloud that carries no links.
+
+```csharp
+public static DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D? ReferencedPointCloud3D(byte[]? bytes);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.ReferencedPointCloud3D(byte[]).bytes'></a>
+
+`bytes` [System\.Byte](https://learn.microsoft.com/en-us/dotnet/api/system.byte 'System\.Byte')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The encoded buffer\.
+
+#### Returns
+[ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D')  
+A new [ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D'), or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the buffer could not be decoded\.
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.ReferencedPointCloud3D(double[],double[],double[],int[],DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection)'></a>
+
+## Create\.ReferencedPointCloud3D\(double\[\], double\[\], double\[\], int\[\], PointCloudReferenceCollection\) Method
+
+Creates a [ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D') from three coordinate arrays and their per\-point identifiers, dropping points with a non\-finite coordinate\.
+
+```csharp
+public static DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D? ReferencedPointCloud3D(double[]? x, double[]? y, double[]? z, int[]? referenceIndexes, DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection? pointCloudReferenceCollection);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.ReferencedPointCloud3D(double[],double[],double[],int[],DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection).x'></a>
+
+`x` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The X coordinates\.
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.ReferencedPointCloud3D(double[],double[],double[],int[],DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection).y'></a>
+
+`y` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The Y coordinates\.
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.ReferencedPointCloud3D(double[],double[],double[],int[],DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection).z'></a>
+
+`z` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The Z coordinates\.
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.ReferencedPointCloud3D(double[],double[],double[],int[],DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection).referenceIndexes'></a>
+
+`referenceIndexes` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The per\-point identifiers, one per point, where \-1 marks a point that links to nothing\.
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.ReferencedPointCloud3D(double[],double[],double[],int[],DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection).pointCloudReferenceCollection'></a>
+
+`pointCloudReferenceCollection` [PointCloudReferenceCollection](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudReferenceCollection')
+
+The reference table the identifiers index into\.
+
+#### Returns
+[ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D')  
+A new [ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D'), or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the arrays are null, of unequal length, or hold no finite point\.
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.ReferencedPointCloud3D(double[][],int[],DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection)'></a>
+
+## Create\.ReferencedPointCloud3D\(double\[\]\[\], int\[\], PointCloudReferenceCollection\) Method
+
+Creates a [ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D') from coordinate arrays and their per\-point identifiers, dropping points with a non\-finite coordinate\.
+
+The filter is expressed as a permutation and applied to the coordinates and the identifiers by the same gather, which is what keeps a point and its model object together across a change of point count.
+
+```csharp
+public static DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D? ReferencedPointCloud3D(double[][]? coordinates, int[]? referenceIndexes, DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection? pointCloudReferenceCollection);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.ReferencedPointCloud3D(double[][],int[],DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection).coordinates'></a>
+
+`coordinates` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The coordinate arrays, one per axis, all of equal length\. Exactly three axes are required\.
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.ReferencedPointCloud3D(double[][],int[],DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection).referenceIndexes'></a>
+
+`referenceIndexes` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The per\-point identifiers, one per point, where \-1 marks a point that links to nothing\.
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.ReferencedPointCloud3D(double[][],int[],DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection).pointCloudReferenceCollection'></a>
+
+`pointCloudReferenceCollection` [PointCloudReferenceCollection](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudReferenceCollection')
+
+The reference table the identifiers index into\.
+
+#### Returns
+[ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D')  
+A new [ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D'), or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the input is null, not three\-dimensional, ragged, or holds no finite point\.
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.ReferencedPointCloud3D(thisDiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D,DiGi.Core.Interfaces.ISerializableReference)'></a>
+
+## Create\.ReferencedPointCloud3D\(this ReferencedPointCloud3D, ISerializableReference\) Method
+
+Extracts the points of a cloud that link to one model object, as a cloud in its own right\.
+
+The extracted cloud keeps the identifiers and the whole reference table rather than being renumbered, so an identifier means the same thing in the extract as in the source and the two can be compared without a translation step. The entries that keep no points simply go unread.
+
+```csharp
+public static DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D? ReferencedPointCloud3D(this DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D? referencedPointCloud3D, DiGi.Core.Interfaces.ISerializableReference? reference);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.ReferencedPointCloud3D(thisDiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D,DiGi.Core.Interfaces.ISerializableReference).referencedPointCloud3D'></a>
+
+`referencedPointCloud3D` [ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D')
+
+The cloud to extract from\.
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.ReferencedPointCloud3D(thisDiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D,DiGi.Core.Interfaces.ISerializableReference).reference'></a>
+
+`reference` [DiGi\.Core\.Interfaces\.ISerializableReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.iserializablereference 'DiGi\.Core\.Interfaces\.ISerializableReference')
+
+The model object to extract the points of\.
+
+#### Returns
+[ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D')  
+A new [ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D') holding the points of the model object, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the cloud carries no link to it\.
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.ReferencedPointCloud3D(thisSystem.Collections.Generic.IEnumerable_DiGi.Geometry.Spatial.Classes.Point3D_,System.Collections.Generic.IEnumerable_DiGi.Core.Interfaces.ISerializableReference_)'></a>
+
+## Create\.ReferencedPointCloud3D\(this IEnumerable\<Point3D\>, IEnumerable\<ISerializableReference\>\) Method
+
+Creates a [ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D') from a sequence of points and the model object each one belongs to, dropping null entries and points with a non\-finite coordinate\.
+
+The two sequences are consumed in lockstep, so a null point discards its reference with it. This is why the cloud cannot simply be built from the point constructor and then handed a separate array: that constructor drops null points silently, which would shift every later reference onto the wrong point.
+
+The reference table and the identifiers are built together, and the non-finite filter is applied to both by one permutation, so the two halves cannot come out of step.
+
+```csharp
+public static DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D? ReferencedPointCloud3D(this System.Collections.Generic.IEnumerable<DiGi.Geometry.Spatial.Classes.Point3D?>? point3Ds, System.Collections.Generic.IEnumerable<DiGi.Core.Interfaces.ISerializableReference>? references);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.ReferencedPointCloud3D(thisSystem.Collections.Generic.IEnumerable_DiGi.Geometry.Spatial.Classes.Point3D_,System.Collections.Generic.IEnumerable_DiGi.Core.Interfaces.ISerializableReference_).point3Ds'></a>
+
+`point3Ds` [System\.Collections\.Generic\.IEnumerable&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1 'System\.Collections\.Generic\.IEnumerable\`1')[DiGi\.Geometry\.Spatial\.Classes\.Point3D](https://learn.microsoft.com/en-us/dotnet/api/digi.geometry.spatial.classes.point3d 'DiGi\.Geometry\.Spatial\.Classes\.Point3D')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1 'System\.Collections\.Generic\.IEnumerable\`1')
+
+The points to store\.
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.ReferencedPointCloud3D(thisSystem.Collections.Generic.IEnumerable_DiGi.Geometry.Spatial.Classes.Point3D_,System.Collections.Generic.IEnumerable_DiGi.Core.Interfaces.ISerializableReference_).references'></a>
+
+`references` [System\.Collections\.Generic\.IEnumerable&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1 'System\.Collections\.Generic\.IEnumerable\`1')[DiGi\.Core\.Interfaces\.ISerializableReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.iserializablereference 'DiGi\.Core\.Interfaces\.ISerializableReference')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1 'System\.Collections\.Generic\.IEnumerable\`1')
+
+The model object each point belongs to, in the same order\. A null entry marks a point that links to nothing\.
+
+#### Returns
+[ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D')  
+A new [ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D'), or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when either input is null or no usable point remains\.
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.ReferencedPointCloud3D(thisSystem.IO.FileInfo)'></a>
+
+## Create\.ReferencedPointCloud3D\(this FileInfo\) Method
+
+Creates a [ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D') by reading a file holding a coordinate block optionally followed by an identifier block\.
+
+Never throws. A missing or unreadable file yields [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null').
+
+```csharp
+public static DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D? ReferencedPointCloud3D(this System.IO.FileInfo? fileInfo);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.ReferencedPointCloud3D(thisSystem.IO.FileInfo).fileInfo'></a>
+
+`fileInfo` [System\.IO\.FileInfo](https://learn.microsoft.com/en-us/dotnet/api/system.io.fileinfo 'System\.IO\.FileInfo')
+
+The file to read\.
+
+#### Returns
+[ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D')  
+A new [ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D'), or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the file could not be read or decoded\.
 
 <a name='DiGi.Geometry.PointCloud.Spatial.Create.Triangle3D(thisDiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D,DiGi.Geometry.Spatial.Classes.Point3D,double)'></a>
 
@@ -401,6 +620,45 @@ The distance by which the box is widened on every axis before testing\.
 #### Returns
 [PointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.PointCloud3D')  
 A new [PointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.PointCloud3D') holding the points inside the box, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when nothing qualifies\.
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Query.InRange(thisDiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D,DiGi.Geometry.Spatial.Classes.BoundingBox3D,double)'></a>
+
+## Query\.InRange\(this ReferencedPointCloud3D, BoundingBox3D, double\) Method
+
+Filters a cloud that carries per\-point model object links down to the points that fall inside an axis\-aligned box, carrying the links with them\.
+
+This overload exists because extension methods bind statically. Without it a filtered cloud would come back as a plain [PointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.PointCloud3D') and the links would be gone; with it, the links survive as long as the variable is typed as the referenced cloud at the call site.
+
+The points and their identifiers are compacted by ONE permutation, obtained from [InRangeIndexes\(this PointCloud3D, BoundingBox3D, double\)](DiGi.Geometry.PointCloud.Spatial.md#DiGi.Geometry.PointCloud.Spatial.Query.InRangeIndexes(thisDiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D,DiGi.Geometry.Spatial.Classes.BoundingBox3D,double) 'DiGi\.Geometry\.PointCloud\.Spatial\.Query\.InRangeIndexes\(this DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.PointCloud3D, DiGi\.Geometry\.Spatial\.Classes\.BoundingBox3D, double\)'). Gathering them separately is what would let them drift apart, and a cloud whose identifiers are offset by one looks entirely healthy while attributing every point to the wrong model object.
+
+The reference table is shared with the source rather than copied, which is safe because the table has no mutating members and identifiers stay valid under filtering. An entry that keeps no points simply goes unused.
+
+```csharp
+public static DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D? InRange(this DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D? referencedPointCloud3D, DiGi.Geometry.Spatial.Classes.BoundingBox3D? boundingBox3D, double tolerance=1E-06);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Query.InRange(thisDiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D,DiGi.Geometry.Spatial.Classes.BoundingBox3D,double).referencedPointCloud3D'></a>
+
+`referencedPointCloud3D` [ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D')
+
+The cloud to filter\.
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Query.InRange(thisDiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D,DiGi.Geometry.Spatial.Classes.BoundingBox3D,double).boundingBox3D'></a>
+
+`boundingBox3D` [DiGi\.Geometry\.Spatial\.Classes\.BoundingBox3D](https://learn.microsoft.com/en-us/dotnet/api/digi.geometry.spatial.classes.boundingbox3d 'DiGi\.Geometry\.Spatial\.Classes\.BoundingBox3D')
+
+The box to filter against\.
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Query.InRange(thisDiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D,DiGi.Geometry.Spatial.Classes.BoundingBox3D,double).tolerance'></a>
+
+`tolerance` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+The distance by which the box is widened on every axis before testing\.
+
+#### Returns
+[ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D')  
+A new [ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D') holding the points inside the box, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when nothing qualifies\.
 
 <a name='DiGi.Geometry.PointCloud.Spatial.Query.InRangeCount(thisDiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D,DiGi.Geometry.Spatial.Classes.BoundingBox3D,double)'></a>
 
@@ -611,6 +869,35 @@ The number of neighbours to retrieve\.
 #### Returns
 [System\.Collections\.Generic\.List&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[PointCloudNeighbor](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudNeighbor 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudNeighbor')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')  
 A [System\.Collections\.Generic\.List&lt;&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1') of [PointCloudNeighbor](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudNeighbor 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudNeighbor') ordered nearest first, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the cloud is empty or the count is not positive\.
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Query.PointIndexes(thisDiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D,DiGi.Core.Interfaces.ISerializableReference)'></a>
+
+## Query\.PointIndexes\(this ReferencedPointCloud3D, ISerializableReference\) Method
+
+Retrieves the indexes of the points that link to a given model object\.
+
+The reference is resolved to its identifier once and the points are then matched on an integer, rather than comparing a reference per point. Comparing references per point would also be a correctness trap: between two interface typed operands the equality operators are plain reference equality, so the comparison would silently answer false for equal references that are not the same object.
+
+```csharp
+public static int[]? PointIndexes(this DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D? referencedPointCloud3D, DiGi.Core.Interfaces.ISerializableReference? reference);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Query.PointIndexes(thisDiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D,DiGi.Core.Interfaces.ISerializableReference).referencedPointCloud3D'></a>
+
+`referencedPointCloud3D` [ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D')
+
+The cloud to search\.
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Query.PointIndexes(thisDiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D,DiGi.Core.Interfaces.ISerializableReference).reference'></a>
+
+`reference` [DiGi\.Core\.Interfaces\.ISerializableReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.iserializablereference 'DiGi\.Core\.Interfaces\.ISerializableReference')
+
+The model object to select the points of\.
+
+#### Returns
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')  
+An ascending [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32') array of zero\-based point indexes, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the cloud carries no link to the model object\.
 
 <a name='DiGi.Geometry.PointCloud.Spatial.Query.TryGetNearestIndexes(thisDiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D,double,double,double,int,int,int)'></a>
 

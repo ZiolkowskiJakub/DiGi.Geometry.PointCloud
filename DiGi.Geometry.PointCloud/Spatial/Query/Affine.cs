@@ -8,7 +8,7 @@ namespace DiGi.Geometry.PointCloud.Spatial
     {
         /// <summary>
         /// Flattens a three-dimensional transform into a row-major affine matrix of three rows of four values.
-        /// <para>A transform group is composed into a single matrix rather than being replayed per point, so applying it to a cloud costs one multiply-add chain per coordinate regardless of how many transforms the group holds. Composition order matches the per-point behaviour of <see cref="DiGi.Geometry.Spatial.Classes.Coordinate3D.Transform(ITransform3D)"/>, where each member of a group is applied in sequence.</para>
+        /// <para>A transform group is composed into a single matrix rather than being replayed per point, so applying it to a cloud costs one multiply-add chain per coordinate regardless of how many transforms the group holds. Composition order matches the per-point behaviour of <see cref="Coordinate3D.Transform(ITransform3D)"/>, where each member of a group is applied in sequence.</para>
         /// </summary>
         /// <param name="transform3D">The transform to flatten.</param>
         /// <returns>A twelve element <see cref="double"/> array holding the rows of the affine matrix, or <see langword="null"/> when the transform is null or not a recognised kind.</returns>

@@ -33,7 +33,7 @@ namespace DiGi.Geometry.PointCloud.Spatial.Classes
             /// Gets the point at the current position.
             /// </summary>
             /// <value>A <see cref="Point"/> holding the current coordinates.</value>
-            public Point Current
+            public readonly Point Current
             {
                 get
                 {

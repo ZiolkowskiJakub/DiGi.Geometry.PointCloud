@@ -78,6 +78,55 @@ namespace DiGi.Geometry.PointCloud.Spatial
         }
 
         /// <summary>
+        /// Filters a cloud that carries per-point model object links down to the points that fall inside an axis-aligned box, carrying the links with them.
+        /// <para>This overload exists because extension methods bind statically. Without it a filtered cloud would come back as a plain <see cref="Classes.PointCloud3D"/> and the links would be gone; with it, the links survive as long as the variable is typed as the referenced cloud at the call site.</para>
+        /// <para>The points and their identifiers are compacted by ONE permutation, obtained from <see cref="InRangeIndexes(Classes.PointCloud3D, BoundingBox3D, double)"/>. Gathering them separately is what would let them drift apart, and a cloud whose identifiers are offset by one looks entirely healthy while attributing every point to the wrong model object.</para>
+        /// <para>The reference table is shared with the source rather than copied, which is safe because the table has no mutating members and identifiers stay valid under filtering. An entry that keeps no points simply goes unused.</para>
+        /// </summary>
+        /// <param name="referencedPointCloud3D">The cloud to filter.</param>
+        /// <param name="boundingBox3D">The box to filter against.</param>
+        /// <param name="tolerance">The distance by which the box is widened on every axis before testing.</param>
+        /// <returns>A new <see cref="Classes.ReferencedPointCloud3D"/> holding the points inside the box, or <see langword="null"/> when nothing qualifies.</returns>
+        public static Classes.ReferencedPointCloud3D? InRange(this Classes.ReferencedPointCloud3D? referencedPointCloud3D, BoundingBox3D? boundingBox3D, double tolerance = DiGi.Core.Constants.Tolerance.Distance)
+        {
+            double[][]? coordinates = referencedPointCloud3D?.GetCoordinates(false);
+            if (coordinates == null || boundingBox3D == null)
+            {
+                return null;
+            }
+
+            double[] minimums = Minimums(boundingBox3D, tolerance);
+            double[] maximums = Maximums(boundingBox3D, tolerance);
+
+            // The same early-out the base filter makes, and correct for the same reason: the copy constructor
+            // deep-copies the identifiers and the table, so the copy shares nothing with the source.
+            BoundingBox3D? boundingBox3D_Cloud = referencedPointCloud3D!.GetBoundingBox();
+            if (boundingBox3D_Cloud != null
+                && boundingBox3D_Cloud.MinX >= minimums[0] && boundingBox3D_Cloud.MaxX <= maximums[0]
+                && boundingBox3D_Cloud.MinY >= minimums[1] && boundingBox3D_Cloud.MaxY <= maximums[1]
+                && boundingBox3D_Cloud.MinZ >= minimums[2] && boundingBox3D_Cloud.MaxZ <= maximums[2])
+            {
+                return new Classes.ReferencedPointCloud3D(referencedPointCloud3D);
+            }
+
+            List<int>? indexes = InRangeIndexes(referencedPointCloud3D, boundingBox3D, tolerance);
+            if (indexes == null || indexes.Count == 0)
+            {
+                return null;
+            }
+
+            double[][]? coordinates_InRange = Core.Create.GatheredCoordinates(coordinates, indexes);
+            if (coordinates_InRange == null)
+            {
+                return null;
+            }
+
+            int[]? referenceIndexes = Core.Create.GatheredReferenceIndexes(referencedPointCloud3D.GetReferenceIndexes(false), indexes);
+
+            return new Classes.ReferencedPointCloud3D(coordinates_InRange[0], coordinates_InRange[1], coordinates_InRange[2], referenceIndexes, referencedPointCloud3D.GetPointCloudReferenceCollection(false), false);
+        }
+
+        /// <summary>
         /// Counts the points of a cloud that fall inside an axis-aligned box, without materializing them.
         /// <para>Useful for sizing a buffer once when a caller intends to filter repeatedly, which avoids repeatedly allocating and discarding large object heap arrays.</para>
         /// </summary>

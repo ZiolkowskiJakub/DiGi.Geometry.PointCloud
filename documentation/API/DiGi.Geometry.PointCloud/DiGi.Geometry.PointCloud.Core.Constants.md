@@ -83,6 +83,116 @@ public const byte BinaryMagic_3 = 67;
 #### Field Value
 [System\.Byte](https://learn.microsoft.com/en-us/dotnet/api/system.byte 'System\.Byte')
 
+<a name='DiGi.Geometry.PointCloud.Core.Constants.PointCloud.BinaryReferenceElementSize'></a>
+
+## PointCloud\.BinaryReferenceElementSize Field
+
+The size in bytes of a single identifier in the binary point cloud reference format\.
+
+Written into the header rather than assumed, so that a narrower or wider identifier can be introduced later without a version bump: the payload length follows from this value. A size is sufficient to describe the element because an identifier is always an integer, unlike a coordinate.
+
+```csharp
+public const int BinaryReferenceElementSize = 4;
+```
+
+#### Field Value
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+<a name='DiGi.Geometry.PointCloud.Core.Constants.PointCloud.BinaryReferenceFlagCollection'></a>
+
+## PointCloud\.BinaryReferenceFlagCollection Field
+
+The flag marking a binary point cloud reference payload that carries its reference table with it\.
+
+Clear when the payload travels inside a serialized object that already holds the table as a member, and set when it travels as a standalone file that has to be self-contained.
+
+```csharp
+public const uint BinaryReferenceFlagCollection = 1;
+```
+
+#### Field Value
+[System\.UInt32](https://learn.microsoft.com/en-us/dotnet/api/system.uint32 'System\.UInt32')
+
+<a name='DiGi.Geometry.PointCloud.Core.Constants.PointCloud.BinaryReferenceHeaderLength'></a>
+
+## PointCloud\.BinaryReferenceHeaderLength Field
+
+The length in bytes of the fixed header of the binary point cloud reference format\.
+
+Deliberately the same length and the same field order as [BinaryHeaderLength](DiGi.Geometry.PointCloud.Core.Constants.md#DiGi.Geometry.PointCloud.Core.Constants.PointCloud.BinaryHeaderLength 'DiGi\.Geometry\.PointCloud\.Core\.Constants\.PointCloud\.BinaryHeaderLength'), so that the two headers read and write through the same shape.
+
+```csharp
+public const int BinaryReferenceHeaderLength = 32;
+```
+
+#### Field Value
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+<a name='DiGi.Geometry.PointCloud.Core.Constants.PointCloud.BinaryReferenceMagic_0'></a>
+
+## PointCloud\.BinaryReferenceMagic\_0 Field
+
+The first byte of the four byte magic identifier of the binary point cloud reference format, spelling "DGPR"\.
+
+```csharp
+public const byte BinaryReferenceMagic_0 = 68;
+```
+
+#### Field Value
+[System\.Byte](https://learn.microsoft.com/en-us/dotnet/api/system.byte 'System\.Byte')
+
+<a name='DiGi.Geometry.PointCloud.Core.Constants.PointCloud.BinaryReferenceMagic_1'></a>
+
+## PointCloud\.BinaryReferenceMagic\_1 Field
+
+The second byte of the four byte magic identifier of the binary point cloud reference format\.
+
+```csharp
+public const byte BinaryReferenceMagic_1 = 71;
+```
+
+#### Field Value
+[System\.Byte](https://learn.microsoft.com/en-us/dotnet/api/system.byte 'System\.Byte')
+
+<a name='DiGi.Geometry.PointCloud.Core.Constants.PointCloud.BinaryReferenceMagic_2'></a>
+
+## PointCloud\.BinaryReferenceMagic\_2 Field
+
+The third byte of the four byte magic identifier of the binary point cloud reference format\.
+
+```csharp
+public const byte BinaryReferenceMagic_2 = 80;
+```
+
+#### Field Value
+[System\.Byte](https://learn.microsoft.com/en-us/dotnet/api/system.byte 'System\.Byte')
+
+<a name='DiGi.Geometry.PointCloud.Core.Constants.PointCloud.BinaryReferenceMagic_3'></a>
+
+## PointCloud\.BinaryReferenceMagic\_3 Field
+
+The fourth byte of the four byte magic identifier of the binary point cloud reference format\.
+
+```csharp
+public const byte BinaryReferenceMagic_3 = 82;
+```
+
+#### Field Value
+[System\.Byte](https://learn.microsoft.com/en-us/dotnet/api/system.byte 'System\.Byte')
+
+<a name='DiGi.Geometry.PointCloud.Core.Constants.PointCloud.BinaryReferenceVersion'></a>
+
+## PointCloud\.BinaryReferenceVersion Field
+
+The version number written into the header of the binary point cloud reference format\.
+
+```csharp
+public const int BinaryReferenceVersion = 1;
+```
+
+#### Field Value
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
 <a name='DiGi.Geometry.PointCloud.Core.Constants.PointCloud.BinaryVersion'></a>
 
 ## PointCloud\.BinaryVersion Field

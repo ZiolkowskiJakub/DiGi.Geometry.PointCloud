@@ -9,9 +9,9 @@ namespace DiGi.Geometry.PointCloud.Core.Classes
 {
     /// <summary>
     /// Represents an abstract, dimension-agnostic cloud of points stored one array per coordinate axis.
-    /// <para>The layout is deliberately coordinate-major rather than a list of point objects. A point object derived from <see cref="DiGi.Geometry.Core.Classes.Coordinate"/> is a heap object wrapping its own array, which costs roughly eighty bytes and two allocations per point; ten million points would occupy about eight hundred megabytes across twenty million objects that the garbage collector must trace. Three plain <see cref="double"/> arrays hold the same data in about two hundred and forty megabytes across three allocations, and because a <see cref="double"/> array contains no references the collector marks the header and never walks the payload.</para>
+    /// <para>The layout is deliberately coordinate-major rather than a list of point objects. A point object derived from <see cref="Geometry.Core.Classes.Coordinate"/> is a heap object wrapping its own array, which costs roughly eighty bytes and two allocations per point; ten million points would occupy about eight hundred megabytes across twenty million objects that the garbage collector must trace. Three plain <see cref="double"/> arrays hold the same data in about two hundred and forty megabytes across three allocations, and because a <see cref="double"/> array contains no references the collector marks the header and never walks the payload.</para>
     /// <para>The layout is also what makes vectorisation possible: four consecutive values in an axis array are four different points' values for that axis, which is exactly the shape a lane-wise minimum or comparison needs. Interleaved storage would mix axes within a lane, and point objects are not contiguous at all.</para>
-    /// <para>This diverges from <see cref="DiGi.Geometry.Core.Classes.Mesh{TPoint}"/> on purpose. A mesh is random-access and topology-driven at thousands to a million vertices, where the object-per-vertex cost is irrelevant and per-vertex behaviour is required. A cloud is bulk and streaming at millions to billions of points with no topology at all.</para>
+    /// <para>This diverges from <see cref="Geometry.Core.Classes.Mesh{TPoint}"/> on purpose. A mesh is random-access and topology-driven at thousands to a million vertices, where the object-per-vertex cost is irrelevant and per-vertex behaviour is required. A cloud is bulk and streaming at millions to billions of points with no topology at all.</para>
     /// <para>Instances are safe for concurrent reads. Mutation through a move or transform requires external synchronization, the same contract as a standard list.</para>
     /// </summary>
     public abstract class PointCloud : SerializableObject, IPointCloud
@@ -65,7 +65,7 @@ namespace DiGi.Geometry.PointCloud.Core.Classes
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PointCloud"/> class from a <see cref="JsonObject"/>.
-        /// <para>The dimension is assigned before deserialization runs, mirroring <see cref="DiGi.Geometry.Core.Classes.Coordinate(JsonObject, int)"/>, because the coordinate payload cannot be validated without it.</para>
+        /// <para>The dimension is assigned before deserialization runs, mirroring <see cref="Geometry.Core.Classes.Coordinate(JsonObject, int)"/>, because the coordinate payload cannot be validated without it.</para>
         /// </summary>
         /// <param name="jsonObject">The <see cref="JsonObject"/> holding the serialized cloud. This value can be null.</param>
         /// <param name="dimension">The number of coordinate axes.</param>
@@ -143,7 +143,7 @@ namespace DiGi.Geometry.PointCloud.Core.Classes
 
         /// <summary>
         /// Gets the number of points in the cloud.
-        /// <para>Returns zero rather than a negative sentinel when the cloud holds no data, so that a counted loop becomes a no-op and an allocation sized from this value succeeds. This deliberately differs from <see cref="DiGi.Geometry.Core.Classes.Mesh{TPoint}.PointsCount"/>.</para>
+        /// <para>Returns zero rather than a negative sentinel when the cloud holds no data, so that a counted loop becomes a no-op and an allocation sized from this value succeeds. This deliberately differs from <see cref="Geometry.Core.Classes.Mesh{TPoint}.PointsCount"/>.</para>
         /// </summary>
         /// <value>An <see cref="int"/> point count of zero or more.</value>
         [JsonIgnore]

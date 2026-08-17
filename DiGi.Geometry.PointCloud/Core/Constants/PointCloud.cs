@@ -97,5 +97,48 @@ namespace DiGi.Geometry.PointCloud.Core.Constants
         /// The fourth byte of the four byte magic identifier of the binary point cloud format.
         /// </summary>
         public const byte BinaryMagic_3 = (byte)'C';
+
+        /// <summary>
+        /// The length in bytes of the fixed header of the binary point cloud reference format.
+        /// <para>Deliberately the same length and the same field order as <see cref="BinaryHeaderLength"/>, so that the two headers read and write through the same shape.</para>
+        /// </summary>
+        public const int BinaryReferenceHeaderLength = 32;
+
+        /// <summary>
+        /// The version number written into the header of the binary point cloud reference format.
+        /// </summary>
+        public const int BinaryReferenceVersion = 1;
+
+        /// <summary>
+        /// The size in bytes of a single identifier in the binary point cloud reference format.
+        /// <para>Written into the header rather than assumed, so that a narrower or wider identifier can be introduced later without a version bump: the payload length follows from this value. A size is sufficient to describe the element because an identifier is always an integer, unlike a coordinate.</para>
+        /// </summary>
+        public const int BinaryReferenceElementSize = 4;
+
+        /// <summary>
+        /// The flag marking a binary point cloud reference payload that carries its reference table with it.
+        /// <para>Clear when the payload travels inside a serialized object that already holds the table as a member, and set when it travels as a standalone file that has to be self-contained.</para>
+        /// </summary>
+        public const uint BinaryReferenceFlagCollection = 1;
+
+        /// <summary>
+        /// The first byte of the four byte magic identifier of the binary point cloud reference format, spelling "DGPR".
+        /// </summary>
+        public const byte BinaryReferenceMagic_0 = (byte)'D';
+
+        /// <summary>
+        /// The second byte of the four byte magic identifier of the binary point cloud reference format.
+        /// </summary>
+        public const byte BinaryReferenceMagic_1 = (byte)'G';
+
+        /// <summary>
+        /// The third byte of the four byte magic identifier of the binary point cloud reference format.
+        /// </summary>
+        public const byte BinaryReferenceMagic_2 = (byte)'P';
+
+        /// <summary>
+        /// The fourth byte of the four byte magic identifier of the binary point cloud reference format.
+        /// </summary>
+        public const byte BinaryReferenceMagic_3 = (byte)'R';
     }
 }

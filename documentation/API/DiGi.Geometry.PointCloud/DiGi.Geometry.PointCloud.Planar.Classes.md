@@ -539,7 +539,7 @@ The cloud to walk\.
 Gets the point at the current position\.
 
 ```csharp
-public DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D.Point Current { get; }
+public readonly DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D.Point Current { get; }
 ```
 
 #### Property Value
@@ -857,7 +857,7 @@ The view to walk\.
 Gets the point at the current position\.
 
 ```csharp
-public DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D.Point Current { get; }
+public readonly DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D.Point Current { get; }
 ```
 
 #### Property Value

@@ -14,7 +14,7 @@ namespace DiGi.Geometry.PointCloud.Core
         /// </summary>
         /// <param name="coordinates">The coordinate arrays, one per axis, all of equal length.</param>
         /// <returns>A new <see cref="Classes.PointCloudIndex"/>, or <see langword="null"/> when the input is null, ragged, empty or not two- or three-dimensional.</returns>
-        internal static Classes.PointCloudIndex? PointCloudIndex(double[][]? coordinates)
+        internal static PointCloudIndex? PointCloudIndex(double[][]? coordinates)
         {
             if (coordinates == null)
             {
@@ -196,7 +196,7 @@ namespace DiGi.Geometry.PointCloud.Core
                 }
             }
 
-            return new Classes.PointCloudIndex(dimension, order, nodes);
+            return new PointCloudIndex(dimension, order, nodes);
         }
 
         /// <summary>

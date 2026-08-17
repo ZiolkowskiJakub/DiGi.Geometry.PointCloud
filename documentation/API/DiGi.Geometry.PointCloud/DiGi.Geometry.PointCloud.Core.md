@@ -37,6 +37,39 @@ The coordinate arrays, one per axis, all of equal length\. Index zero is X, inde
 [System\.Byte](https://learn.microsoft.com/en-us/dotnet/api/system.byte 'System\.Byte')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')  
 A [System\.Byte](https://learn.microsoft.com/en-us/dotnet/api/system.byte 'System\.Byte') array holding the encoded cloud, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the input is null, empty, ragged or too large to address\.
 
+<a name='DiGi.Geometry.PointCloud.Core.Convert.ToSystem_Bytes(thisint[],DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection)'></a>
+
+## Convert\.ToSystem\_Bytes\(this int\[\], PointCloudReferenceCollection\) Method
+
+Encodes per\-point model object identifiers, and optionally the reference table they index into, as a self\-contained binary payload\.
+
+The layout is a fixed [BinaryReferenceHeaderLength](DiGi.Geometry.PointCloud.Core.Constants.md#DiGi.Geometry.PointCloud.Core.Constants.PointCloud.BinaryReferenceHeaderLength 'DiGi\.Geometry\.PointCloud\.Core\.Constants\.PointCloud\.BinaryReferenceHeaderLength') byte little-endian header holding the magic identifier, version, identifier size, point count and flags, followed by the identifiers and then, when the table is embedded, its length prefixed UTF-8 JSON.
+
+The payload is self-describing, carrying its own point count, because the reflection serializer applies members in the order they appear in the JSON document rather than in the order the type declares them. A payload that relied on the coordinates having been read first would decode correctly or not depending on how a document happened to be written.
+
+The table is embedded only when the payload has to stand alone, as it does in a file. Inside a serialized object the table is already a member, and embedding it there would write the same fact twice and invite the two copies to disagree.
+
+```csharp
+public static byte[]? ToSystem_Bytes(this int[]? referenceIndexes, DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection? pointCloudReferenceCollection);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Convert.ToSystem_Bytes(thisint[],DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection).referenceIndexes'></a>
+
+`referenceIndexes` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The per\-point identifiers, where \-1 marks a point that links to nothing\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Convert.ToSystem_Bytes(thisint[],DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection).pointCloudReferenceCollection'></a>
+
+`pointCloudReferenceCollection` [PointCloudReferenceCollection](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudReferenceCollection')
+
+The reference table to embed, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') to write the identifiers alone\.
+
+#### Returns
+[System\.Byte](https://learn.microsoft.com/en-us/dotnet/api/system.byte 'System\.Byte')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')  
+A [System\.Byte](https://learn.microsoft.com/en-us/dotnet/api/system.byte 'System\.Byte') array holding the encoded payload, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the input is null or too large to address\.
+
 <a name='DiGi.Geometry.PointCloud.Core.Create'></a>
 
 ## Create Class
@@ -163,6 +196,43 @@ The expected number of coordinate axes, or a value of zero or less to accept wha
 [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')  
 A jagged [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double') array holding one array per axis, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the buffer could not be decoded\.
 
+<a name='DiGi.Geometry.PointCloud.Core.Create.Coordinates(byte[],int,int)'></a>
+
+## Create\.Coordinates\(byte\[\], int, int\) Method
+
+Decodes a coordinate\-major point payload from a binary point cloud block starting at an offset inside a longer buffer\.
+
+Unlike [Coordinates\(byte\[\], int\)](DiGi.Geometry.PointCloud.Core.md#DiGi.Geometry.PointCloud.Core.Create.Coordinates(byte[],int) 'DiGi\.Geometry\.PointCloud\.Core\.Create\.Coordinates\(byte\[\], int\)') this accepts trailing bytes, because a block located by offset is expected to be followed by something: a file holding a cloud together with its per-point model object links stores the two blocks one after the other.
+
+Every failure mode returns [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') rather than throwing, matching the exact length form.
+
+```csharp
+public static double[][]? Coordinates(byte[]? bytes, int dimension, int startIndex);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.Coordinates(byte[],int,int).bytes'></a>
+
+`bytes` [System\.Byte](https://learn.microsoft.com/en-us/dotnet/api/system.byte 'System\.Byte')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The encoded buffer\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.Coordinates(byte[],int,int).dimension'></a>
+
+`dimension` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+The expected number of coordinate axes, or a value of zero or less to accept whatever the header declares\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.Coordinates(byte[],int,int).startIndex'></a>
+
+`startIndex` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+The offset at which the block starts\.
+
+#### Returns
+[System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')  
+A jagged [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double') array holding one array per axis, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the block could not be decoded\.
+
 <a name='DiGi.Geometry.PointCloud.Core.Create.CoordinatesInRange(double[][],double[],double[])'></a>
 
 ## Create\.CoordinatesInRange\(double\[\]\[\], double\[\], double\[\]\) Method
@@ -262,6 +332,147 @@ The coordinate arrays, one per axis, all of equal length\.
 [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')  
 A new jagged [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double') array holding only finite points, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the input is null, ragged, or contains no finite point\.
 
+<a name='DiGi.Geometry.PointCloud.Core.Create.FiniteIndexes(double[][])'></a>
+
+## Create\.FiniteIndexes\(double\[\]\[\]\) Method
+
+Retrieves the indexes of the points whose every coordinate is finite\.
+
+This is the permutation carrying form of [FiniteCoordinates\(double\[\]\[\]\)](DiGi.Geometry.PointCloud.Core.md#DiGi.Geometry.PointCloud.Core.Create.FiniteCoordinates(double[][]) 'DiGi\.Geometry\.PointCloud\.Core\.Create\.FiniteCoordinates\(double\[\]\[\]\)'). Filtering non-finite points changes the point count, so anything stored alongside the coordinates has to be compacted by the same permutation; returning the indexes rather than the coordinates is what lets one filter drive both.
+
+The predicate matches [FiniteCoordinates\(double\[\]\[\]\)](DiGi.Geometry.PointCloud.Core.md#DiGi.Geometry.PointCloud.Core.Create.FiniteCoordinates(double[][]) 'DiGi\.Geometry\.PointCloud\.Core\.Create\.FiniteCoordinates\(double\[\]\[\]\)') exactly, so the two produce the same points in the same order.
+
+```csharp
+public static int[]? FiniteIndexes(double[][]? coordinates);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.FiniteIndexes(double[][]).coordinates'></a>
+
+`coordinates` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The coordinate arrays, one per axis, all of equal length\.
+
+#### Returns
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')  
+An ascending [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32') array of zero\-based point indexes, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the input is null, ragged, or contains no finite point\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.GatheredCoordinates(double[][],int[])'></a>
+
+## Create\.GatheredCoordinates\(double\[\]\[\], int\[\]\) Method
+
+Builds a new coordinate payload holding the points named by a permutation, in the order the permutation names them\.
+
+This is the single gather used by every filter that changes the point count, so that the coordinates and anything stored alongside them are compacted by one shared routine and cannot drift apart.
+
+An out of range index yields [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') rather than a partly filled result, because a filter that quietly returned fewer or wrong points would be discovered as corrupted geometry much later.
+
+```csharp
+public static double[][]? GatheredCoordinates(double[][]? coordinates, int[]? indexes);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.GatheredCoordinates(double[][],int[]).coordinates'></a>
+
+`coordinates` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The coordinate arrays, one per axis, all of equal length\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.GatheredCoordinates(double[][],int[]).indexes'></a>
+
+`indexes` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The zero\-based point indexes to gather\.
+
+#### Returns
+[System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')  
+A new jagged [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double') array holding the gathered points, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the input is null, ragged, empty, or names a point that does not exist\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.GatheredCoordinates(double[][],System.Collections.Generic.IReadOnlyList_int_)'></a>
+
+## Create\.GatheredCoordinates\(double\[\]\[\], IReadOnlyList\<int\>\) Method
+
+Builds a new coordinate payload holding the points named by a permutation, in the order the permutation names them\.
+
+```csharp
+public static double[][]? GatheredCoordinates(double[][]? coordinates, System.Collections.Generic.IReadOnlyList<int>? indexes);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.GatheredCoordinates(double[][],System.Collections.Generic.IReadOnlyList_int_).coordinates'></a>
+
+`coordinates` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The coordinate arrays, one per axis, all of equal length\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.GatheredCoordinates(double[][],System.Collections.Generic.IReadOnlyList_int_).indexes'></a>
+
+`indexes` [System\.Collections\.Generic\.IReadOnlyList&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1 'System\.Collections\.Generic\.IReadOnlyList\`1')[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1 'System\.Collections\.Generic\.IReadOnlyList\`1')
+
+The zero\-based point indexes to gather\.
+
+#### Returns
+[System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')  
+A new jagged [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double') array holding the gathered points, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the input is null, ragged, empty, or names a point that does not exist\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.GatheredReferenceIndexes(int[],int[])'></a>
+
+## Create\.GatheredReferenceIndexes\(int\[\], int\[\]\) Method
+
+Builds a new per\-point identifier array holding the identifiers of the points named by a permutation, in the order the permutation names them\.
+
+This is the counterpart of [GatheredCoordinates\(double\[\]\[\], int\[\]\)](DiGi.Geometry.PointCloud.Core.md#DiGi.Geometry.PointCloud.Core.Create.GatheredCoordinates(double[][],int[]) 'DiGi\.Geometry\.PointCloud\.Core\.Create\.GatheredCoordinates\(double\[\]\[\], int\[\]\)') and must be driven by the same permutation. Gathering the coordinates without gathering the identifiers is what turns a filter into silent data corruption: the result keeps its point count and its table, so nothing looks wrong, while every point after the first discarded one is attributed to the wrong model object.
+
+The reference table itself is NOT rebuilt. Identifiers stay stable under filtering, so a table entry that no longer has any point simply goes unused, which costs one unread entry and keeps every surviving identifier valid.
+
+```csharp
+public static int[]? GatheredReferenceIndexes(int[]? referenceIndexes, int[]? indexes);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.GatheredReferenceIndexes(int[],int[]).referenceIndexes'></a>
+
+`referenceIndexes` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The per\-point identifiers, one per point of the source cloud\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.GatheredReferenceIndexes(int[],int[]).indexes'></a>
+
+`indexes` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The zero\-based point indexes to gather\.
+
+#### Returns
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')  
+A new [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32') array holding the gathered identifiers, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when either input is null, empty, or names a point that does not exist\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.GatheredReferenceIndexes(int[],System.Collections.Generic.IReadOnlyList_int_)'></a>
+
+## Create\.GatheredReferenceIndexes\(int\[\], IReadOnlyList\<int\>\) Method
+
+Builds a new per\-point identifier array holding the identifiers of the points named by a permutation, in the order the permutation names them\.
+
+```csharp
+public static int[]? GatheredReferenceIndexes(int[]? referenceIndexes, System.Collections.Generic.IReadOnlyList<int>? indexes);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.GatheredReferenceIndexes(int[],System.Collections.Generic.IReadOnlyList_int_).referenceIndexes'></a>
+
+`referenceIndexes` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The per\-point identifiers, one per point of the source cloud\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.GatheredReferenceIndexes(int[],System.Collections.Generic.IReadOnlyList_int_).indexes'></a>
+
+`indexes` [System\.Collections\.Generic\.IReadOnlyList&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1 'System\.Collections\.Generic\.IReadOnlyList\`1')[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1 'System\.Collections\.Generic\.IReadOnlyList\`1')
+
+The zero\-based point indexes to gather\.
+
+#### Returns
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')  
+A new [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32') array holding the gathered identifiers, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when either input is null, empty, or names a point that does not exist\.
+
 <a name='DiGi.Geometry.PointCloud.Core.Create.PointCloudIndex(double[][])'></a>
 
 ## Create\.PointCloudIndex\(double\[\]\[\]\) Method
@@ -288,6 +499,120 @@ The coordinate arrays, one per axis, all of equal length\.
 #### Returns
 [PointCloudIndex](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndex 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudIndex')  
 A new [PointCloudIndex](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudIndex 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudIndex'), or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the input is null, ragged, empty or not two\- or three\-dimensional\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.PointCloudReferenceCollection(byte[],int)'></a>
+
+## Create\.PointCloudReferenceCollection\(byte\[\], int\) Method
+
+Decodes the embedded reference table from a binary payload produced by [ToSystem\_Bytes\(this int\[\], PointCloudReferenceCollection\)](DiGi.Geometry.PointCloud.Core.md#DiGi.Geometry.PointCloud.Core.Convert.ToSystem_Bytes(thisint[],DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection) 'DiGi\.Geometry\.PointCloud\.Core\.Convert\.ToSystem\_Bytes\(this int\[\], DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudReferenceCollection\)')\.
+
+Returns [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the payload carries identifiers alone, which is the normal case for a payload travelling inside a serialized object that already holds the table as a member. Every failure mode returns [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') rather than throwing, matching [ReferenceIndexes\(byte\[\], int\)](DiGi.Geometry.PointCloud.Core.md#DiGi.Geometry.PointCloud.Core.Create.ReferenceIndexes(byte[],int) 'DiGi\.Geometry\.PointCloud\.Core\.Create\.ReferenceIndexes\(byte\[\], int\)').
+
+```csharp
+public static DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection? PointCloudReferenceCollection(byte[]? bytes, int startIndex=0);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.PointCloudReferenceCollection(byte[],int).bytes'></a>
+
+`bytes` [System\.Byte](https://learn.microsoft.com/en-us/dotnet/api/system.byte 'System\.Byte')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The encoded buffer\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.PointCloudReferenceCollection(byte[],int).startIndex'></a>
+
+`startIndex` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+The offset at which the block starts, which is non\-zero when the block follows a coordinate block in the same buffer\.
+
+#### Returns
+[PointCloudReferenceCollection](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudReferenceCollection')  
+The embedded [PointCloudReferenceCollection](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudReferenceCollection'), or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when none is present or the buffer could not be decoded\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.PointCloudReferenceCollection(System.Collections.Generic.IEnumerable_DiGi.Core.Interfaces.ISerializableReference_)'></a>
+
+## Create\.PointCloudReferenceCollection\(IEnumerable\<ISerializableReference\>\) Method
+
+Builds a reference table from a sequence of references, discarding nulls and duplicates\.
+
+The first occurrence of a reference fixes its identifier, and later duplicates are dropped. Deduplication happens here rather than in the constructor because a duplicate is a defect to clean up, not a shape to validate, and the constructor sits on the hot path of every clone and copy.
+
+```csharp
+public static DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection? PointCloudReferenceCollection(System.Collections.Generic.IEnumerable<DiGi.Core.Interfaces.ISerializableReference>? references);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.PointCloudReferenceCollection(System.Collections.Generic.IEnumerable_DiGi.Core.Interfaces.ISerializableReference_).references'></a>
+
+`references` [System\.Collections\.Generic\.IEnumerable&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1 'System\.Collections\.Generic\.IEnumerable\`1')[DiGi\.Core\.Interfaces\.ISerializableReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.iserializablereference 'DiGi\.Core\.Interfaces\.ISerializableReference')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1 'System\.Collections\.Generic\.IEnumerable\`1')
+
+The references to store\. This value can be null\.
+
+#### Returns
+[PointCloudReferenceCollection](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudReferenceCollection')  
+A new [PointCloudReferenceCollection](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudReferenceCollection'), or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when no valid reference was supplied\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.PointCloudReferenceCollection(System.Collections.Generic.IEnumerable_DiGi.Core.Interfaces.ISerializableReference_,int[])'></a>
+
+## Create\.PointCloudReferenceCollection\(IEnumerable\<ISerializableReference\>, int\[\]\) Method
+
+Builds a reference table and the matching per\-point identifier array from a sequence holding one reference per point\.
+
+This is the shape a segmentation pass produces: it walks the points once, assigning a new identifier the first time it meets a model object and reusing it afterwards. Building both halves here is what keeps them consistent, because the table and the identifiers are the same fact recorded twice and nothing else in the library can check that they agree.
+
+A null entry in the sequence marks a point that links to nothing and is recorded as -1.
+
+```csharp
+public static DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection? PointCloudReferenceCollection(System.Collections.Generic.IEnumerable<DiGi.Core.Interfaces.ISerializableReference>? references, out int[]? referenceIndexes);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.PointCloudReferenceCollection(System.Collections.Generic.IEnumerable_DiGi.Core.Interfaces.ISerializableReference_,int[]).references'></a>
+
+`references` [System\.Collections\.Generic\.IEnumerable&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1 'System\.Collections\.Generic\.IEnumerable\`1')[DiGi\.Core\.Interfaces\.ISerializableReference](https://learn.microsoft.com/en-us/dotnet/api/digi.core.interfaces.iserializablereference 'DiGi\.Core\.Interfaces\.ISerializableReference')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1 'System\.Collections\.Generic\.IEnumerable\`1')
+
+The references, one per point and in point order\. This value can be null\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.PointCloudReferenceCollection(System.Collections.Generic.IEnumerable_DiGi.Core.Interfaces.ISerializableReference_,int[]).referenceIndexes'></a>
+
+`referenceIndexes` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+When this method returns, contains the per\-point identifiers, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the sequence was null\.
+
+#### Returns
+[PointCloudReferenceCollection](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudReferenceCollection')  
+A new [PointCloudReferenceCollection](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudReferenceCollection'), or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when every point links to nothing\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.ReferenceIndexes(byte[],int)'></a>
+
+## Create\.ReferenceIndexes\(byte\[\], int\) Method
+
+Decodes the per\-point model object identifiers from a binary payload produced by [ToSystem\_Bytes\(this int\[\], PointCloudReferenceCollection\)](DiGi.Geometry.PointCloud.Core.md#DiGi.Geometry.PointCloud.Core.Convert.ToSystem_Bytes(thisint[],DiGi.Geometry.PointCloud.Core.Classes.PointCloudReferenceCollection) 'DiGi\.Geometry\.PointCloud\.Core\.Convert\.ToSystem\_Bytes\(this int\[\], DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudReferenceCollection\)')\.
+
+Every failure mode returns [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') rather than throwing, so a truncated, misaligned, foreign or future-versioned buffer degrades to an empty result instead of propagating an exception out of a deserialization path.
+
+The embedded reference table, when present, is ignored here. Read it with [PointCloudReferenceCollection\(byte\[\], int\)](DiGi.Geometry.PointCloud.Core.md#DiGi.Geometry.PointCloud.Core.Create.PointCloudReferenceCollection(byte[],int) 'DiGi\.Geometry\.PointCloud\.Core\.Create\.PointCloudReferenceCollection\(byte\[\], int\)').
+
+```csharp
+public static int[]? ReferenceIndexes(byte[]? bytes, int startIndex=0);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.ReferenceIndexes(byte[],int).bytes'></a>
+
+`bytes` [System\.Byte](https://learn.microsoft.com/en-us/dotnet/api/system.byte 'System\.Byte')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The encoded buffer\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Create.ReferenceIndexes(byte[],int).startIndex'></a>
+
+`startIndex` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+The offset at which the block starts, which is non\-zero when the block follows a coordinate block in the same buffer\.
+
+#### Returns
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')  
+An [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32') array holding one identifier per point, where \-1 marks a point that links to nothing, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the buffer could not be decoded\.
 
 <a name='DiGi.Geometry.PointCloud.Core.Modify'></a>
 
@@ -510,6 +835,37 @@ public static class Query
 Inheritance [System\.Object](https://learn.microsoft.com/en-us/dotnet/api/system.object 'System\.Object') → Query
 ### Methods
 
+<a name='DiGi.Geometry.PointCloud.Core.Query.BinaryLength(byte[],int)'></a>
+
+## Query\.BinaryLength\(byte\[\], int\) Method
+
+Retrieves the total length in bytes of the binary point cloud block starting at an offset, header included\.
+
+The length follows entirely from the header, which is what allows a block to be located inside a longer buffer: a file holding a cloud and its per-point model object links stores the two blocks one after the other, and this is how the reader finds where the first one ends.
+
+Returns -1 rather than throwing for every malformed input, matching the decoders.
+
+```csharp
+public static int BinaryLength(byte[]? bytes, int startIndex=0);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.BinaryLength(byte[],int).bytes'></a>
+
+`bytes` [System\.Byte](https://learn.microsoft.com/en-us/dotnet/api/system.byte 'System\.Byte')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The encoded buffer\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.BinaryLength(byte[],int).startIndex'></a>
+
+`startIndex` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+The offset at which the block starts\.
+
+#### Returns
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')  
+The total length of the block in bytes, or \-1 when no valid block starts at the offset\.
+
 <a name='DiGi.Geometry.PointCloud.Core.Query.CoordinateExtremes(thisdouble[][])'></a>
 
 ## Query\.CoordinateExtremes\(this double\[\]\[\]\) Method
@@ -573,6 +929,35 @@ The longest edge a triangle may have, in model units\. Values of zero or less ke
 #### Returns
 [System\.Collections\.Generic\.List&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')  
 A [System\.Collections\.Generic\.List&lt;&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1') of three element index arrays, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the input is invalid or nothing could be triangulated\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.Dimension(double[][],int)'></a>
+
+## Query\.Dimension\(double\[\]\[\], int\) Method
+
+Retrieves the number of coordinate axes of a payload, together with its point count, when the payload is rectangular\.
+
+Reports zero for a ragged payload rather than the length of the outer array, so that a single check answers both "how many axes" and "is this usable at all".
+
+```csharp
+public static int Dimension(double[][]? coordinates, out int count);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.Dimension(double[][],int).coordinates'></a>
+
+`coordinates` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The coordinate arrays, one per axis, all of equal length\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.Dimension(double[][],int).count'></a>
+
+`count` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+When this method returns, contains the number of points, or zero when the payload is not rectangular\.
+
+#### Returns
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')  
+The number of axes, or zero when the payload is null, empty or ragged\.
 
 <a name='DiGi.Geometry.PointCloud.Core.Query.IndexDepth(int,int)'></a>
 
@@ -1049,3 +1434,32 @@ The coordinate arrays, one per axis\.
 #### Returns
 [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')  
 The number of points, or \-1 when the payload is null, ragged or holds an unsupported number of axes\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.PointIndexes(int[],int)'></a>
+
+## Query\.PointIndexes\(int\[\], int\) Method
+
+Retrieves the indexes of the points carrying a given model object identifier\.
+
+Returned in ascending order, so the result can drive [GatheredCoordinates\(double\[\]\[\], int\[\]\)](DiGi.Geometry.PointCloud.Core.md#DiGi.Geometry.PointCloud.Core.Create.GatheredCoordinates(double[][],int[]) 'DiGi\.Geometry\.PointCloud\.Core\.Create\.GatheredCoordinates\(double\[\]\[\], int\[\]\)') directly and the extracted sub-cloud keeps the point order of its source.
+
+```csharp
+public static int[]? PointIndexes(int[]? referenceIndexes, int referenceIndex);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.PointIndexes(int[],int).referenceIndexes'></a>
+
+`referenceIndexes` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The per\-point identifiers, one per point\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.PointIndexes(int[],int).referenceIndex'></a>
+
+`referenceIndex` [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
+The identifier to select, where a negative value selects the points that link to nothing\.
+
+#### Returns
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')  
+An ascending [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32') array of zero\-based point indexes, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the input is null or no point carries the identifier\.
