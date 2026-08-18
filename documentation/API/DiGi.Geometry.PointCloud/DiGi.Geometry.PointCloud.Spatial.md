@@ -193,6 +193,33 @@ The coordinate arrays, one per axis, all of equal length\. Exactly three axes ar
 [PointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.PointCloud3D')  
 A new [PointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.PointCloud3D'), or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the input is null, not three\-dimensional, ragged, or holds no finite point\.
 
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.PointCloud3D(thisSystem.Collections.Generic.IEnumerable_DiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D_)'></a>
+
+## Create\.PointCloud3D\(this IEnumerable\<PointCloud3D\>\) Method
+
+Creates a single [PointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.PointCloud3D') holding every point of the supplied clouds, in the order the clouds are given\.
+
+Null and empty clouds in the sequence are skipped. Points with a non-finite coordinate are dropped, as they are by every other overload here.
+
+No [DiGi\.Geometry\.Spatial\.Classes\.Point3D](https://learn.microsoft.com/en-us/dotnet/api/digi.geometry.spatial.classes.point3d 'DiGi\.Geometry\.Spatial\.Classes\.Point3D') object is created anywhere on this path: the sources are read through [GetCoordinates\(bool\)](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloud.GetCoordinates(bool) 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloud\.GetCoordinates\(bool\)') without cloning and block copied into arrays allocated once at the combined size.
+
+IMPORTANT: the result is a plain cloud. A [ReferencedPointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.ReferencedPointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.ReferencedPointCloud3D') passed in here comes back with its per-point model object links gone, and because extension methods bind statically nothing at the call site warns about it. Merging referenced clouds means merging their reference tables and renumbering their identifiers; there is deliberately no overload for it.
+
+```csharp
+public static DiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D? PointCloud3D(this System.Collections.Generic.IEnumerable<DiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D?>? pointCloud3Ds);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Create.PointCloud3D(thisSystem.Collections.Generic.IEnumerable_DiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D_).pointCloud3Ds'></a>
+
+`pointCloud3Ds` [System\.Collections\.Generic\.IEnumerable&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1 'System\.Collections\.Generic\.IEnumerable\`1')[PointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.PointCloud3D')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1 'System\.Collections\.Generic\.IEnumerable\`1')
+
+The clouds to concatenate\.
+
+#### Returns
+[PointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.PointCloud3D')  
+A new [PointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.PointCloud3D'), or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the input is null or holds no usable point\.
+
 <a name='DiGi.Geometry.PointCloud.Spatial.Create.PointCloud3D(thisSystem.Collections.Generic.IEnumerable_DiGi.Geometry.Spatial.Classes.Point3D_)'></a>
 
 ## Create\.PointCloud3D\(this IEnumerable\<Point3D\>\) Method

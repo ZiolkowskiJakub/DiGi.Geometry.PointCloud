@@ -1,5 +1,6 @@
 using DiGi.Geometry.Spatial.Classes;
 using DiGi.Geometry.PointCloud.Spatial.Classes;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -23,6 +24,66 @@ namespace DiGi.Geometry.PointCloud.Spatial
             PointCloud3D pointCloud3D = new(point3Ds);
 
             return PointCloud3D(pointCloud3D.GetCoordinates(false));
+        }
+
+        /// <summary>
+        /// Creates a single <see cref="Classes.PointCloud3D"/> holding every point of the supplied clouds, in the order the clouds are given.
+        /// <para>Null and empty clouds in the sequence are skipped. Points with a non-finite coordinate are dropped, as they are by every other overload here.</para>
+        /// <para>No <see cref="Point3D"/> object is created anywhere on this path: the sources are read through <see cref="Core.Classes.PointCloud.GetCoordinates(bool)"/> without cloning and block copied into arrays allocated once at the combined size.</para>
+        /// <para>IMPORTANT: the result is a plain cloud. A <see cref="Classes.ReferencedPointCloud3D"/> passed in here comes back with its per-point model object links gone, and because extension methods bind statically nothing at the call site warns about it. Merging referenced clouds means merging their reference tables and renumbering their identifiers; there is deliberately no overload for it.</para>
+        /// </summary>
+        /// <param name="pointCloud3Ds">The clouds to concatenate.</param>
+        /// <returns>A new <see cref="Classes.PointCloud3D"/>, or <see langword="null"/> when the input is null or holds no usable point.</returns>
+        public static PointCloud3D? PointCloud3D(this IEnumerable<PointCloud3D?>? pointCloud3Ds)
+        {
+            if (pointCloud3Ds == null)
+            {
+                return null;
+            }
+
+            List<double[][]> coordinates_Sources = [];
+
+            int count = 0;
+            foreach (PointCloud3D? pointCloud3D in pointCloud3Ds)
+            {
+                double[][]? coordinates = pointCloud3D?.GetCoordinates(false);
+                if (coordinates == null || coordinates.Length != 3)
+                {
+                    continue;
+                }
+
+                int count_Source = coordinates[0].Length;
+                if (count_Source == 0)
+                {
+                    continue;
+                }
+
+                coordinates_Sources.Add(coordinates);
+                count += count_Source;
+            }
+
+            if (count == 0)
+            {
+                return null;
+            }
+
+            double[] x = new double[count];
+            double[] y = new double[count];
+            double[] z = new double[count];
+
+            int index = 0;
+            foreach (double[][] coordinates in coordinates_Sources)
+            {
+                int count_Source = coordinates[0].Length;
+
+                Array.Copy(coordinates[0], 0, x, index, count_Source);
+                Array.Copy(coordinates[1], 0, y, index, count_Source);
+                Array.Copy(coordinates[2], 0, z, index, count_Source);
+
+                index += count_Source;
+            }
+
+            return PointCloud3D([x, y, z]);
         }
 
         /// <summary>
@@ -102,7 +163,7 @@ namespace DiGi.Geometry.PointCloud.Spatial
             {
                 return null;
             }
-            catch (System.UnauthorizedAccessException)
+            catch (UnauthorizedAccessException)
             {
                 return null;
             }
