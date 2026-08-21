@@ -14,6 +14,7 @@ namespace DiGi.Geometry.PointCloud.Spatial.Classes
     {
         private PointCloud3D? pointCloud3D;
         private double maximumEdgeLength;
+        private double edgeLengthFactor;
         private PointCloudHeightSelection pointCloudHeightSelection;
 
         /// <summary>
@@ -22,11 +23,13 @@ namespace DiGi.Geometry.PointCloud.Spatial.Classes
         /// <param name="cellSize">The edge length of the decimation grid, in model units. Values of zero or less triangulate every point.</param>
         /// <param name="maximumEdgeLength">The longest edge a triangle may have, in model units. Values of zero or less keep every triangle.</param>
         /// <param name="pointCloudHeightSelection">Which measurement in a cell survives decimation.</param>
+        /// <param name="edgeLengthFactor">How many times its own vertex spacing a triangle's longest edge may reach before it is discarded. Values of zero or less keep every triangle.</param>
         /// <param name="tolerance">The distance tolerance used when comparing coordinates.</param>
-        public HeightFieldPointCloud3DMeshSolver(double cellSize = 0, double maximumEdgeLength = 0, PointCloudHeightSelection pointCloudHeightSelection = PointCloudHeightSelection.Lowest, double tolerance = DiGi.Core.Constants.Tolerance.Distance)
+        public HeightFieldPointCloud3DMeshSolver(double cellSize = 0, double maximumEdgeLength = 0, PointCloudHeightSelection pointCloudHeightSelection = PointCloudHeightSelection.Lowest, double edgeLengthFactor = 0, double tolerance = DiGi.Core.Constants.Tolerance.Distance)
             : base(cellSize, tolerance)
         {
             this.maximumEdgeLength = maximumEdgeLength;
+            this.edgeLengthFactor = edgeLengthFactor;
             this.pointCloudHeightSelection = pointCloudHeightSelection;
         }
 
@@ -58,6 +61,26 @@ namespace DiGi.Geometry.PointCloud.Spatial.Classes
             set
             {
                 maximumEdgeLength = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets how many times its own vertex spacing a triangle's longest edge may reach before it is discarded.
+        /// <para>An alternative to <see cref="MaximumEdgeLength"/>, not a companion to it. Where that one measures every triangle against a fixed distance and removes all of them at once, this measures each against the spacing of its own vertices and removes them only from the boundary inwards - so a cloud whose density varies needs no threshold chosen for it, and a site missing from the interior cannot open a hole.</para>
+        /// <para>Trades one behaviour for another, and the trade is worth knowing: an empty area entirely enclosed by data is spanned rather than opened, because nothing over it ever reaches the boundary to be removed. Only emptiness joined to the outside is cleared. Where an interior void has to stay open, use <see cref="MaximumEdgeLength"/> and accept that a single missing site then opens a hole.</para>
+        /// <para>Both may be set, in which case the fixed limit is applied first. Leave this at zero to keep the previous behaviour exactly.</para>
+        /// </summary>
+        /// <value>A <see cref="double"/> holding the factor. Values of zero or less keep every triangle.</value>
+        public double EdgeLengthFactor
+        {
+            get
+            {
+                return edgeLengthFactor;
+            }
+
+            set
+            {
+                edgeLengthFactor = value;
             }
         }
 
@@ -105,6 +128,15 @@ namespace DiGi.Geometry.PointCloud.Spatial.Classes
             if (indexes == null)
             {
                 return false;
+            }
+
+            if (edgeLengthFactor > 0)
+            {
+                indexes = Core.Query.ErodedIndexes(coordinates[0], coordinates[1], indexes, edgeLengthFactor);
+                if (indexes == null)
+                {
+                    return false;
+                }
             }
 
             double[] x = coordinates[0];

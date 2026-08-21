@@ -22,35 +22,61 @@ public class DelaunayPointCloud2DMeshSolver : DiGi.Geometry.PointCloud.Core.Clas
 Inheritance [System\.Object](https://learn.microsoft.com/en-us/dotnet/api/system.object 'System\.Object') → [DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudMeshSolver&lt;](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudMeshSolver_TPointCloud,TMesh_ 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudMeshSolver\<TPointCloud,TMesh\>')[PointCloud2D](DiGi.Geometry.PointCloud.Planar.Classes.md#DiGi.Geometry.PointCloud.Planar.Classes.PointCloud2D 'DiGi\.Geometry\.PointCloud\.Planar\.Classes\.PointCloud2D')[,](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudMeshSolver_TPointCloud,TMesh_ 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudMeshSolver\<TPointCloud,TMesh\>')[DiGi\.Geometry\.Planar\.Classes\.Mesh2D](https://learn.microsoft.com/en-us/dotnet/api/digi.geometry.planar.classes.mesh2d 'DiGi\.Geometry\.Planar\.Classes\.Mesh2D')[&gt;](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudMeshSolver_TPointCloud,TMesh_ 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudMeshSolver\<TPointCloud,TMesh\>') → DelaunayPointCloud2DMeshSolver
 ### Constructors
 
-<a name='DiGi.Geometry.PointCloud.Planar.Classes.DelaunayPointCloud2DMeshSolver.DelaunayPointCloud2DMeshSolver(double,double,double)'></a>
+<a name='DiGi.Geometry.PointCloud.Planar.Classes.DelaunayPointCloud2DMeshSolver.DelaunayPointCloud2DMeshSolver(double,double,double,double)'></a>
 
-## DelaunayPointCloud2DMeshSolver\(double, double, double\) Constructor
+## DelaunayPointCloud2DMeshSolver\(double, double, double, double\) Constructor
 
 Initializes a new instance of the [DelaunayPointCloud2DMeshSolver](DiGi.Geometry.PointCloud.Planar.Classes.md#DiGi.Geometry.PointCloud.Planar.Classes.DelaunayPointCloud2DMeshSolver 'DiGi\.Geometry\.PointCloud\.Planar\.Classes\.DelaunayPointCloud2DMeshSolver') class\.
 
 ```csharp
-public DelaunayPointCloud2DMeshSolver(double cellSize=0.0, double maximumEdgeLength=0.0, double tolerance=1E-06);
+public DelaunayPointCloud2DMeshSolver(double cellSize=0.0, double maximumEdgeLength=0.0, double edgeLengthFactor=0.0, double tolerance=1E-06);
 ```
 #### Parameters
 
-<a name='DiGi.Geometry.PointCloud.Planar.Classes.DelaunayPointCloud2DMeshSolver.DelaunayPointCloud2DMeshSolver(double,double,double).cellSize'></a>
+<a name='DiGi.Geometry.PointCloud.Planar.Classes.DelaunayPointCloud2DMeshSolver.DelaunayPointCloud2DMeshSolver(double,double,double,double).cellSize'></a>
 
 `cellSize` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
 
 The edge length of the decimation grid, in model units\. Values of zero or less triangulate every point\.
 
-<a name='DiGi.Geometry.PointCloud.Planar.Classes.DelaunayPointCloud2DMeshSolver.DelaunayPointCloud2DMeshSolver(double,double,double).maximumEdgeLength'></a>
+<a name='DiGi.Geometry.PointCloud.Planar.Classes.DelaunayPointCloud2DMeshSolver.DelaunayPointCloud2DMeshSolver(double,double,double,double).maximumEdgeLength'></a>
 
 `maximumEdgeLength` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
 
 The longest edge a triangle may have, in model units\. Values of zero or less keep every triangle\.
 
-<a name='DiGi.Geometry.PointCloud.Planar.Classes.DelaunayPointCloud2DMeshSolver.DelaunayPointCloud2DMeshSolver(double,double,double).tolerance'></a>
+<a name='DiGi.Geometry.PointCloud.Planar.Classes.DelaunayPointCloud2DMeshSolver.DelaunayPointCloud2DMeshSolver(double,double,double,double).edgeLengthFactor'></a>
+
+`edgeLengthFactor` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+How many times its own vertex spacing a triangle's longest edge may reach before it is discarded\. Values of zero or less keep every triangle\.
+
+<a name='DiGi.Geometry.PointCloud.Planar.Classes.DelaunayPointCloud2DMeshSolver.DelaunayPointCloud2DMeshSolver(double,double,double,double).tolerance'></a>
 
 `tolerance` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
 
 The distance tolerance used when comparing coordinates\.
 ### Properties
+
+<a name='DiGi.Geometry.PointCloud.Planar.Classes.DelaunayPointCloud2DMeshSolver.EdgeLengthFactor'></a>
+
+## DelaunayPointCloud2DMeshSolver\.EdgeLengthFactor Property
+
+Gets or sets how many times its own vertex spacing a triangle's longest edge may reach before it is discarded\.
+
+An alternative to [MaximumEdgeLength](DiGi.Geometry.PointCloud.Planar.Classes.md#DiGi.Geometry.PointCloud.Planar.Classes.DelaunayPointCloud2DMeshSolver.MaximumEdgeLength 'DiGi\.Geometry\.PointCloud\.Planar\.Classes\.DelaunayPointCloud2DMeshSolver\.MaximumEdgeLength'), not a companion to it. Where that one measures every triangle against a fixed distance and removes all of them at once, this measures each against the spacing of its own vertices and removes them only from the boundary inwards - so a cloud whose density varies needs no threshold chosen for it, and a site missing from the interior cannot open a hole.
+
+Trades one behaviour for another, and the trade is worth knowing: an empty area entirely enclosed by data is spanned rather than opened, because nothing over it ever reaches the boundary to be removed. Only emptiness joined to the outside is cleared. Where an interior void has to stay open, use [MaximumEdgeLength](DiGi.Geometry.PointCloud.Planar.Classes.md#DiGi.Geometry.PointCloud.Planar.Classes.DelaunayPointCloud2DMeshSolver.MaximumEdgeLength 'DiGi\.Geometry\.PointCloud\.Planar\.Classes\.DelaunayPointCloud2DMeshSolver\.MaximumEdgeLength') and accept that a single missing site then opens a hole.
+
+Both may be set, in which case the fixed limit is applied first. Leave this at zero to keep the previous behaviour exactly.
+
+```csharp
+public double EdgeLengthFactor { get; set; }
+```
+
+#### Property Value
+[System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')  
+A [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double') holding the factor\. Values of zero or less keep every triangle\.
 
 <a name='DiGi.Geometry.PointCloud.Planar.Classes.DelaunayPointCloud2DMeshSolver.Input'></a>
 

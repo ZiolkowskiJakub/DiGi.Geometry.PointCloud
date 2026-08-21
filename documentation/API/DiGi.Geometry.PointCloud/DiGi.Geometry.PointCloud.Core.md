@@ -959,6 +959,55 @@ When this method returns, contains the number of points, or zero when the payloa
 [System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')  
 The number of axes, or zero when the payload is null, empty or ragged\.
 
+<a name='DiGi.Geometry.PointCloud.Core.Query.ErodedIndexes(double[],double[],System.Collections.Generic.List_int[]_,double)'></a>
+
+## Query\.ErodedIndexes\(double\[\], double\[\], List\<int\[\]\>, double\) Method
+
+Removes the triangles that bridge no data from a triangulation, working inwards from its boundary, so that the result can never enclose a hole\.
+
+A Delaunay triangulation covers the convex hull of its sites, which means it also spans concave outlines and empty areas with triangles that look like surface and are not. Removing every triangle that fails a size test at once does clear them, but it also opens a hole around any single site the data happens to be missing, because the triangles that would close over it are exactly the oversized ones.
+
+Here a triangle is only ever removed while it lies on the boundary. Whatever is removed is therefore joined to the outside at the moment it goes, so the removed area always reaches the outer edge and no enclosed hole can form. A site missing from the interior keeps the triangles around it however long their edges are, and reads as a flat spot rather than a gap.
+
+The guarantee has a price, and it is the whole of the trade: an empty area entirely enclosed by data - a lake, a quarry, a pocket the survey never reached - is spanned rather than opened, because no triangle over it ever reaches the boundary to be removed. Only emptiness joined to the outside is cleared. This cannot tell a lake from a dropped measurement and deliberately does not try, so where the difference matters the surface has to be cut against a known outline afterwards. Use the absolute limit instead where an interior void has to stay open and a hole around a missing site is acceptable.
+
+The size test is relative rather than absolute: a triangle is judged against the spacing of its own vertices, taken as the shortest edge each of them carries. A triangulation whose density varies - fine where the surface moves, coarse where it does not - is therefore measured correctly everywhere at once, with no threshold to retune when the sampling changes. The spacing of the three vertices is combined by taking the largest, so the band where a dense area meets a sparse one is judged by the sparse side and survives.
+
+Eroding through a narrow neck can leave the result in disconnected pieces. That is a separation rather than a hole and is left alone.
+
+```csharp
+public static System.Collections.Generic.List<int[]>? ErodedIndexes(double[]? x, double[]? y, System.Collections.Generic.List<int[]>? indexes, double edgeLengthFactor);
+```
+#### Parameters
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.ErodedIndexes(double[],double[],System.Collections.Generic.List_int[]_,double).x'></a>
+
+`x` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The X coordinates of the sites\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.ErodedIndexes(double[],double[],System.Collections.Generic.List_int[]_,double).y'></a>
+
+`y` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')
+
+The Y coordinates of the sites\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.ErodedIndexes(double[],double[],System.Collections.Generic.List_int[]_,double).indexes'></a>
+
+`indexes` [System\.Collections\.Generic\.List&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')
+
+The triangles, as three element index arrays into the coordinate arrays\.
+
+<a name='DiGi.Geometry.PointCloud.Core.Query.ErodedIndexes(double[],double[],System.Collections.Generic.List_int[]_,double).edgeLengthFactor'></a>
+
+`edgeLengthFactor` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+How many times its own vertex spacing a triangle's longest edge may reach before it is treated as bridging no data\. Values of zero or less keep every triangle\.
+
+#### Returns
+[System\.Collections\.Generic\.List&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[\[\]](https://learn.microsoft.com/en-us/dotnet/api/system.array 'System\.Array')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')  
+A [System\.Collections\.Generic\.List&lt;&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1') of the three element index arrays that survived, or [null](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/null 'https://docs\.microsoft\.com/en\-us/dotnet/csharp/language\-reference/keywords/null') when the input is invalid or nothing survived\.
+
 <a name='DiGi.Geometry.PointCloud.Core.Query.IndexDepth(int,int)'></a>
 
 ## Query\.IndexDepth\(int, int\) Method

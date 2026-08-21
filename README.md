@@ -48,6 +48,69 @@ All calculations, queries, transformations, and object mutations MUST be impleme
 
 ---
 
+## 🕳️ Mesh Reconstruction — Hole Policy and Its Trade-off
+
+Both mesh solvers — `DelaunayPointCloud2DMeshSolver` and `HeightFieldPointCloud3DMeshSolver` — start from a
+Delaunay triangulation, which always covers the **convex hull** of its sites. Emptiness of every kind (a
+concave outline, a lake, the edge of a survey, a measurement that was dropped) is therefore spanned by long
+thin triangles that look like surface and are not. Removing those triangles is what the two settings below
+do, and they differ in a way that decides whether the result can contain a hole.
+
+| | `MaximumEdgeLength` | `EdgeLengthFactor` |
+|---|---|---|
+| Criterion | an absolute distance | a multiple of local vertex spacing |
+| Applied | to every triangle at once | only to triangles on the boundary, working inwards |
+| Varying point density | one threshold cannot serve a dense and a sparse area at the same time | judged per triangle against its own vertices; nothing to retune |
+| A site missing from the interior | **opens a hole** around it | spanned; reads as a flat spot |
+| A void enclosed by data (lake, no-data pocket) | left open | **spanned flat** |
+
+Set one or the other. Setting both applies the fixed limit first; leaving both at zero keeps every triangle.
+
+### Why erosion cannot produce a hole
+
+```mermaid
+flowchart LR
+    A[Delaunay over all sites<br/>covers the convex hull] --> B{On the current<br/>boundary?}
+    B -- no --> K[Kept<br/>an interior gap can never be opened]
+    B -- yes --> C{Longest edge exceeds<br/>factor x local spacing?}
+    C -- no --> K
+    C -- yes --> R[Removed<br/>neighbours may now be on the boundary]
+    R --> B
+```
+
+A triangle is only ever removed while it has an edge on the boundary. Whatever is removed is therefore
+joined to the outside at the moment it goes, so the removed region always reaches the outer edge and an
+enclosed hole can never form. That is a guarantee of the procedure, not of the threshold.
+
+### The trade-off
+
+**The guarantee cannot distinguish a dropped measurement from real emptiness.** An area entirely surrounded
+by data is spanned whether it is a point the sampler lost or a lake that was never going to have one,
+because no triangle over it ever reaches the boundary to be removed. Only emptiness joined to the outside
+is cleared.
+
+So the choice is:
+
+* **A surface that must never be perforated** → `EdgeLengthFactor`. Do not then read the mesh as measured
+  ground everywhere it has vertices; if that distinction matters, cut the surface against a known outline
+  afterwards.
+* **An interior void that has to stay open** → `MaximumEdgeLength`, accepting that a single missing site
+  opens a hole around it.
+
+Eroding through a narrow neck can leave the result in disconnected pieces. That is a separation rather than
+a hole, and it is left alone.
+
+### Choosing a factor
+
+The factor is measured against the shortest edge each vertex carries, which on a regular lattice is the
+lattice spacing itself. A regular cell diagonal is 1.41 × spacing, and bridging one absent node needs
+2 × spacing, so a factor below about 2.1 will not close a single-node gap on the boundary and one above
+about 3 begins to bridge genuinely empty ground. `DiGi.GIS.WebAPI` serves terrain at **2.5**, measured on a
+100 m lattice: at a real coverage edge that removes a 2 759 m span across open water while capping the
+longest surviving edge at 224 m.
+
+---
+
 ## 💻 Coding Guidelines for Developers & AI Agents
 
 To maintain codebase health, performance, and compatibility within Visual Studio 2026 / C# 10+ environments, all developers and AI agents must strictly comply with these guidelines.

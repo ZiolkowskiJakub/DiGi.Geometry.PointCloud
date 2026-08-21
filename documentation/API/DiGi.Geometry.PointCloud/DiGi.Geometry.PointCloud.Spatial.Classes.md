@@ -22,41 +22,67 @@ public class HeightFieldPointCloud3DMeshSolver : DiGi.Geometry.PointCloud.Core.C
 Inheritance [System\.Object](https://learn.microsoft.com/en-us/dotnet/api/system.object 'System\.Object') → [DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudMeshSolver&lt;](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudMeshSolver_TPointCloud,TMesh_ 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudMeshSolver\<TPointCloud,TMesh\>')[PointCloud3D](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.PointCloud3D 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.PointCloud3D')[,](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudMeshSolver_TPointCloud,TMesh_ 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudMeshSolver\<TPointCloud,TMesh\>')[DiGi\.Geometry\.Spatial\.Classes\.Mesh3D](https://learn.microsoft.com/en-us/dotnet/api/digi.geometry.spatial.classes.mesh3d 'DiGi\.Geometry\.Spatial\.Classes\.Mesh3D')[&gt;](DiGi.Geometry.PointCloud.Core.Classes.md#DiGi.Geometry.PointCloud.Core.Classes.PointCloudMeshSolver_TPointCloud,TMesh_ 'DiGi\.Geometry\.PointCloud\.Core\.Classes\.PointCloudMeshSolver\<TPointCloud,TMesh\>') → HeightFieldPointCloud3DMeshSolver
 ### Constructors
 
-<a name='DiGi.Geometry.PointCloud.Spatial.Classes.HeightFieldPointCloud3DMeshSolver.HeightFieldPointCloud3DMeshSolver(double,double,DiGi.Geometry.PointCloud.Core.Enums.PointCloudHeightSelection,double)'></a>
+<a name='DiGi.Geometry.PointCloud.Spatial.Classes.HeightFieldPointCloud3DMeshSolver.HeightFieldPointCloud3DMeshSolver(double,double,DiGi.Geometry.PointCloud.Core.Enums.PointCloudHeightSelection,double,double)'></a>
 
-## HeightFieldPointCloud3DMeshSolver\(double, double, PointCloudHeightSelection, double\) Constructor
+## HeightFieldPointCloud3DMeshSolver\(double, double, PointCloudHeightSelection, double, double\) Constructor
 
 Initializes a new instance of the [HeightFieldPointCloud3DMeshSolver](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.HeightFieldPointCloud3DMeshSolver 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.HeightFieldPointCloud3DMeshSolver') class\.
 
 ```csharp
-public HeightFieldPointCloud3DMeshSolver(double cellSize=0.0, double maximumEdgeLength=0.0, DiGi.Geometry.PointCloud.Core.Enums.PointCloudHeightSelection pointCloudHeightSelection=DiGi.Geometry.PointCloud.Core.Enums.PointCloudHeightSelection.Lowest, double tolerance=1E-06);
+public HeightFieldPointCloud3DMeshSolver(double cellSize=0.0, double maximumEdgeLength=0.0, DiGi.Geometry.PointCloud.Core.Enums.PointCloudHeightSelection pointCloudHeightSelection=DiGi.Geometry.PointCloud.Core.Enums.PointCloudHeightSelection.Lowest, double edgeLengthFactor=0.0, double tolerance=1E-06);
 ```
 #### Parameters
 
-<a name='DiGi.Geometry.PointCloud.Spatial.Classes.HeightFieldPointCloud3DMeshSolver.HeightFieldPointCloud3DMeshSolver(double,double,DiGi.Geometry.PointCloud.Core.Enums.PointCloudHeightSelection,double).cellSize'></a>
+<a name='DiGi.Geometry.PointCloud.Spatial.Classes.HeightFieldPointCloud3DMeshSolver.HeightFieldPointCloud3DMeshSolver(double,double,DiGi.Geometry.PointCloud.Core.Enums.PointCloudHeightSelection,double,double).cellSize'></a>
 
 `cellSize` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
 
 The edge length of the decimation grid, in model units\. Values of zero or less triangulate every point\.
 
-<a name='DiGi.Geometry.PointCloud.Spatial.Classes.HeightFieldPointCloud3DMeshSolver.HeightFieldPointCloud3DMeshSolver(double,double,DiGi.Geometry.PointCloud.Core.Enums.PointCloudHeightSelection,double).maximumEdgeLength'></a>
+<a name='DiGi.Geometry.PointCloud.Spatial.Classes.HeightFieldPointCloud3DMeshSolver.HeightFieldPointCloud3DMeshSolver(double,double,DiGi.Geometry.PointCloud.Core.Enums.PointCloudHeightSelection,double,double).maximumEdgeLength'></a>
 
 `maximumEdgeLength` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
 
 The longest edge a triangle may have, in model units\. Values of zero or less keep every triangle\.
 
-<a name='DiGi.Geometry.PointCloud.Spatial.Classes.HeightFieldPointCloud3DMeshSolver.HeightFieldPointCloud3DMeshSolver(double,double,DiGi.Geometry.PointCloud.Core.Enums.PointCloudHeightSelection,double).pointCloudHeightSelection'></a>
+<a name='DiGi.Geometry.PointCloud.Spatial.Classes.HeightFieldPointCloud3DMeshSolver.HeightFieldPointCloud3DMeshSolver(double,double,DiGi.Geometry.PointCloud.Core.Enums.PointCloudHeightSelection,double,double).pointCloudHeightSelection'></a>
 
 `pointCloudHeightSelection` [PointCloudHeightSelection](DiGi.Geometry.PointCloud.Core.Enums.md#DiGi.Geometry.PointCloud.Core.Enums.PointCloudHeightSelection 'DiGi\.Geometry\.PointCloud\.Core\.Enums\.PointCloudHeightSelection')
 
 Which measurement in a cell survives decimation\.
 
-<a name='DiGi.Geometry.PointCloud.Spatial.Classes.HeightFieldPointCloud3DMeshSolver.HeightFieldPointCloud3DMeshSolver(double,double,DiGi.Geometry.PointCloud.Core.Enums.PointCloudHeightSelection,double).tolerance'></a>
+<a name='DiGi.Geometry.PointCloud.Spatial.Classes.HeightFieldPointCloud3DMeshSolver.HeightFieldPointCloud3DMeshSolver(double,double,DiGi.Geometry.PointCloud.Core.Enums.PointCloudHeightSelection,double,double).edgeLengthFactor'></a>
+
+`edgeLengthFactor` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
+
+How many times its own vertex spacing a triangle's longest edge may reach before it is discarded\. Values of zero or less keep every triangle\.
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Classes.HeightFieldPointCloud3DMeshSolver.HeightFieldPointCloud3DMeshSolver(double,double,DiGi.Geometry.PointCloud.Core.Enums.PointCloudHeightSelection,double,double).tolerance'></a>
 
 `tolerance` [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
 
 The distance tolerance used when comparing coordinates\.
 ### Properties
+
+<a name='DiGi.Geometry.PointCloud.Spatial.Classes.HeightFieldPointCloud3DMeshSolver.EdgeLengthFactor'></a>
+
+## HeightFieldPointCloud3DMeshSolver\.EdgeLengthFactor Property
+
+Gets or sets how many times its own vertex spacing a triangle's longest edge may reach before it is discarded\.
+
+An alternative to [MaximumEdgeLength](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.HeightFieldPointCloud3DMeshSolver.MaximumEdgeLength 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.HeightFieldPointCloud3DMeshSolver\.MaximumEdgeLength'), not a companion to it. Where that one measures every triangle against a fixed distance and removes all of them at once, this measures each against the spacing of its own vertices and removes them only from the boundary inwards - so a cloud whose density varies needs no threshold chosen for it, and a site missing from the interior cannot open a hole.
+
+Trades one behaviour for another, and the trade is worth knowing: an empty area entirely enclosed by data is spanned rather than opened, because nothing over it ever reaches the boundary to be removed. Only emptiness joined to the outside is cleared. Where an interior void has to stay open, use [MaximumEdgeLength](DiGi.Geometry.PointCloud.Spatial.Classes.md#DiGi.Geometry.PointCloud.Spatial.Classes.HeightFieldPointCloud3DMeshSolver.MaximumEdgeLength 'DiGi\.Geometry\.PointCloud\.Spatial\.Classes\.HeightFieldPointCloud3DMeshSolver\.MaximumEdgeLength') and accept that a single missing site then opens a hole.
+
+Both may be set, in which case the fixed limit is applied first. Leave this at zero to keep the previous behaviour exactly.
+
+```csharp
+public double EdgeLengthFactor { get; set; }
+```
+
+#### Property Value
+[System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')  
+A [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double') holding the factor\. Values of zero or less keep every triangle\.
 
 <a name='DiGi.Geometry.PointCloud.Spatial.Classes.HeightFieldPointCloud3DMeshSolver.Input'></a>
 
