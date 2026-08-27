@@ -130,13 +130,7 @@ namespace DiGi.Geometry.PointCloud.Core
         /// <param name="startIndex">The inclusive index at which the range starts.</param>
         /// <param name="count">The number of points in the range.</param>
         /// <returns>The number of neighbours written, or -1 when the input is mismatched or the range is out of bounds.</returns>
-        public static int NearestIndexes(
-            this double[][]? coordinates,
-            ReadOnlySpan<double> query,
-            Span<int> indexes,
-            Span<double> distancesSquared,
-            int startIndex,
-            int count)
+        public static int NearestIndexes(this double[][]? coordinates, ReadOnlySpan<double> query, Span<int> indexes, Span<double> distancesSquared, int startIndex, int count)
         {
             if (coordinates == null || startIndex < 0 || count < 0)
             {

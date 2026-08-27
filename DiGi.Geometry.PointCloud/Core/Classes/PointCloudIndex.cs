@@ -230,13 +230,7 @@ namespace DiGi.Geometry.PointCloud.Core.Classes
         /// <param name="indexes">A buffer receiving the point indexes, nearest first. Its length is the number of neighbours requested.</param>
         /// <param name="distancesSquared">A buffer receiving the matching squared distances, which must be at least as long as <paramref name="indexes"/>.</param>
         /// <returns>The number of neighbours written, which is smaller than the requested count when the cloud holds fewer points, or -1 when the input is mismatched or the traversal stack overflowed.</returns>
-        public int NearestIndexes(
-            double[][]? coordinates,
-            double x,
-            double y,
-            double z,
-            Span<int> indexes,
-            Span<double> distancesSquared)
+        public int NearestIndexes(double[][]? coordinates, double x, double y, double z, Span<int> indexes, Span<double> distancesSquared)
         {
             int count_Requested = indexes.Length;
             if (coordinates == null || coordinates.Length != dimension || count_Requested <= 0 || distancesSquared.Length < count_Requested || nodes.Length == 0)

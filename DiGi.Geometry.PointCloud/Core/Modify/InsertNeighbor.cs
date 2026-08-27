@@ -17,13 +17,7 @@ namespace DiGi.Geometry.PointCloud.Core
         /// <param name="filled">The number of entries currently held, updated when the set grows.</param>
         /// <param name="worst">The current rejection radius, updated whenever the set changes. Holds <see cref="double.PositiveInfinity"/> until the set is full.</param>
         /// <returns><see langword="true"/> when the candidate was taken into the set; otherwise <see langword="false"/>.</returns>
-        public static bool InsertNeighbor(
-            Span<int> indexes,
-            Span<double> distancesSquared,
-            int index,
-            double distanceSquared,
-            ref int filled,
-            ref double worst)
+        public static bool InsertNeighbor(Span<int> indexes, Span<double> distancesSquared, int index, double distanceSquared, ref int filled, ref double worst)
         {
             int count = indexes.Length;
             if (count <= 0 || distancesSquared.Length < count || filled < 0 || filled > count)

@@ -18,14 +18,7 @@ namespace DiGi.Geometry.PointCloud.Spatial
         /// <param name="index_2">When this method returns, contains the index of the second closest point.</param>
         /// <param name="index_3">When this method returns, contains the index of the third closest point.</param>
         /// <returns><see langword="true"/> when three distinct points were found; otherwise <see langword="false"/>.</returns>
-        public static bool TryGetNearestIndexes(
-            this Classes.PointCloud3D? pointCloud3D,
-            double x,
-            double y,
-            double z,
-            out int index_1,
-            out int index_2,
-            out int index_3)
+        public static bool TryGetNearestIndexes(this Classes.PointCloud3D? pointCloud3D, double x, double y, double z, out int index_1, out int index_2, out int index_3)
         {
             index_1 = -1;
             index_2 = -1;
